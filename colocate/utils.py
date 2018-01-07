@@ -14,7 +14,7 @@ def get_kernel(kernel):
     :return colocate.col_framework.Kernel:
     """
     from colocate.col_framework import get_kernel, Kernel
-    from colocate.col_implementations import moments
+    from colocate.kernels import moments
     if not kernel:
         kernel = moments()
     elif isinstance(kernel, six.string_types):
@@ -32,8 +32,8 @@ def cube_unify_col_wrapper(xr_func):
     :param func: A (collocation) function which takes two Datasets as its first arguments and returns a Dataset
     :return: A function which takes two Cube objects as its first arguments and returns a Cube object
     """
-    from cis.data_io.convert import from_iris, to_iris
     from iris.util import unify_time_units
+    import xarray as xr
 
     @wraps
     def cube_func(a, b, *args, **kwargs):
@@ -52,12 +52,12 @@ def cube_unify_col_wrapper(xr_func):
 
         unify_time_units([a, b])
         # Convert to xarray
-        ds_a = from_iris(a)
-        ds_b = from_iris(b)
+        ds_a = xr.DataArray.from_iris(a)
+        ds_b = xr.DataArray.from_iris(b)
         # Collocate
         ds = xr_func(ds_a, ds_b, *args, **kwargs)
         # Convert back and return
-        res = to_iris(ds)
+        res = ds.to_iris()
 
         return res
 
