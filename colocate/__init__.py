@@ -28,12 +28,12 @@ def collocate(sample, data, kernel=None, index=None, fill_value=None, missing_da
     index = index or SepConstraint(**kwargs)
     # We can have any kernel, default to moments
 
-    if isinstance(data, list):
-        # Indexing and constraints (for SepConstraintKdTree) will only take place on the first iteration,
+    if isinstance(data, Dataset):
+        # Indexing (for SepConstraintKdTree) will only take place on the first iteration,
         # so we really can just call this method recursively if we've got a list of data.
         output = Dataset()
-        for var in data:
-            output.extend(collocate(sample, var, index, kernel))
+        for var in data.values():
+            output.update(collocate(sample, var, kernel, index))
         return output
 
     index.index_data(sample)
