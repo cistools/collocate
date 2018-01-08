@@ -4,6 +4,17 @@
 from functools import wraps
 
 
+def get_lat_lon_names(data):
+    """
+
+    :param data:
+    :return:
+    """
+    lat_name = next(filter(lambda c: c.lower().startswith('lat'), data.coords.keys()))
+    lon_name = next(filter(lambda c: c.lower().startswith('lon'), data.coords.keys()))
+    return lat_name, lon_name
+
+
 def cube_unify_col_wrapper(xr_func):
     """
     Wrap a function which works on two xarray Datasets with an Cube->Dataset converter to allow calling with an

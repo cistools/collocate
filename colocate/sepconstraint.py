@@ -77,7 +77,7 @@ class SepConstraint:
             indices = self.haversine_distance_kd_tree_index.find_points_within_distance_sample(points, self.h_sep)
 
         for i in iterator:
-            p = points.iloc[0]
+            p = points[i]
             if indices:
                 # Note that data_points has to be a dataframe at this point because of the indexing
                 d_points = data_points[indices[i]]
@@ -97,7 +97,10 @@ class SepConstraint:
         :param int leafsize: The leafsize to use when creating the tree
         """
         from colocate.haversinedistancekdtreeindex import HaversineDistanceKDTreeIndex
-        self.haversine_distance_kd_tree_index = HaversineDistanceKDTreeIndex(data, leafsize)
+        from colocate.utils import get_lat_lon_names
+
+        lat_lon_points = data.to_dataframe(data.name or 'unknown').loc[:, get_lat_lon_names(data)]
+        self.haversine_distance_kd_tree_index = HaversineDistanceKDTreeIndex(lat_lon_points, leafsize)
 
 
 def index_iterator_nditer(points, include_masked=True):

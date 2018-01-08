@@ -23,10 +23,12 @@ def make_dummy_time_series(len=10):
     return xr.DataArray(data, coords={'longitude': (['x', 'y'], lon), 'latitude': (['x', 'y'], lat), 'time': times})
 
 
-def make_dummy_sample_points(**kwargs):
+def make_dummy_sample_points(data=None, **kwargs):
     # Find the length of the first array
     n_values = len(list(kwargs.values())[0])
-    ds = xr.DataArray(np.empty((n_values,)), dims=['obs'], coords={k: (['obs'], v) for k, v in kwargs.items()})
+    data = data if data is not None else np.empty((n_values,))
+    ds = xr.DataArray(data, dims=['obs'], coords={k: (['obs'], v) for k, v in kwargs.items()})
+    # return ds.set_index(obs=kwargs.keys())
     return ds
 
 

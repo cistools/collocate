@@ -194,7 +194,8 @@ class nn_horizontal(Kernel):
               data are a list of HyperPoints. The default point is the first point.
         """
         from colocate.kdtree import haversine
-        iterator = data.iterrows()
+        iterator = data.to_dataframe('vals').iterrows()
+
         try:
             nearest_point = next(iterator)[1]
         except StopIteration:
@@ -225,7 +226,8 @@ class nn_altitude(Kernel):
             Collocation using nearest neighbours in altitude, where both points and
               data are a list of HyperPoints. The default point is the first point.
         """
-        iterator = data.iterrows()
+        iterator = data.to_dataframe('vals').iterrows()
+
         try:
             nearest_point = next(iterator)[1]
         except StopIteration:
@@ -255,7 +257,8 @@ class nn_pressure(Kernel):
             else:
                 return point2.air_pressure / point1.air_pressure
 
-        iterator = data.iterrows()
+        iterator = data.to_dataframe('vals').iterrows()
+
         try:
             nearest_point = next(iterator)[1]
         except StopIteration:
@@ -273,13 +276,20 @@ class nn_time(Kernel):
             Collocation using nearest neighbours in time, where both points and
               data are a list of HyperPoints. The default point is the first point.
         """
-        iterator = data.iterrows()
+        import pandas as pd
+        # TODO I might be able to use the index lookup - if the time index is available
+        # return data.set_index(obs='time').sel(obs=point.time, method='nearest')
+        iterator = data.to_dataframe('vals').iterrows()
+
+        # The iterator returns an Object Series so the time gets promoted to a pd.Timestamp
+        time_point = pd.to_datetime(point.time.values)
+
         try:
             nearest_point = next(iterator)[1]
         except StopIteration:
             # No points to check
             raise ValueError
         for idx, data_point in iterator:
-            if abs(point.time - nearest_point.time) > abs(point.time - data_point.time):
+            if abs(time_point - nearest_point.time) > abs(time_point - data_point.time):
                 nearest_point = data_point
         return nearest_point.vals

@@ -1157,10 +1157,8 @@ class HaversineDistanceKDTree(KDTree):
     nearest neighbours measured by distance along the Earth's surface.
     """
 
-    def __init__(self, data, leafsize=10, mask=None):
-        self.data = np.ma.asarray(data)
-        if mask is not None:
-            self.data.mask = np.column_stack([mask] * data.shape[1])
+    def __init__(self, data, leafsize=10):
+        self.data = np.asarray(data)
         self.n, self.m = np.shape(self.data)
         self.leafsize = int(leafsize)
         if self.leafsize < 1:
@@ -1168,11 +1166,7 @@ class HaversineDistanceKDTree(KDTree):
         self.maxes = np.amax(self.data, axis=0)
         self.mins = np.amin(self.data, axis=0)
 
-        indices = np.arange(self.n)
-        if mask is not None:
-            indices = np.ma.array(indices, mask=mask)
-            indices = indices.compressed()
-        self.tree = self._build(indices, self.maxes, self.mins)
+        self.tree = self._build(np.arange(self.n), self.maxes, self.mins)
 
     def _query(self, x, k=1, eps=0, p=2, distance_upper_bound=np.inf):
 
