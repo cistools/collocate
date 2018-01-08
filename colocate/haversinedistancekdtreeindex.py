@@ -28,7 +28,7 @@ class HaversineDistanceKDTreeIndex(object):
         :param distance: distance in kilometres
         :return: list indices in data of points
         """
-        query_pt = [[point.latitude, point.longitude]]
+        query_pt = [[point.latitude.item(), point.longitude.item()]]
         return self.index.query_ball_point(query_pt, distance)[0]
 
     def find_points_within_distance_sample(self, sample, distance):

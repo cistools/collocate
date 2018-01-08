@@ -216,7 +216,7 @@ class nn_horizontal_kdtree(Kernel):
         Collocation using nearest neighbours along the face of the earth using a k-D tree index.
         """
         nearest_index = self.haversine_distance_kd_tree_index.find_nearest_point(points)
-        nearest_points = data.iloc[nearest_index]
+        nearest_points = data[nearest_index]
         return nearest_points.vals.values
 
 

@@ -24,11 +24,14 @@ class TestSepConstraint(unittest.TestCase):
         # 15m altitude seperation
         a_sep = 15
         # 1 day (and a little bit) time seperation
-        t_sep = 'P1DT1M'
+        t_sep = np.timedelta64(1, 'D') + np.timedelta64(1, 'm')
         # Pressure constraint is 50/40 < p_sep < 60/50
         p_sep = 1.22
 
         constraint = SepConstraint(h_sep=h_sep, a_sep=a_sep, p_sep=p_sep, t_sep=t_sep)
+
+        # Create the index
+        constraint.index_data(ug_data)
 
         # This should leave us with 9 points: [[ 22, 23, 24]
         #                                      [ 27, 28, 29]
@@ -36,10 +39,9 @@ class TestSepConstraint(unittest.TestCase):
         ref_vals = np.array([27., 28., 29., 32., 33., 34.])
 
         new_points = constraint.constrain_points(sample_point, ug_data)
-        new_vals = new_points.vals
 
-        eq_(ref_vals.size, new_vals.size)
-        assert (np.equal(ref_vals, new_vals).all())
+        eq_(ref_vals.size, new_points.size)
+        assert (np.equal(ref_vals, new_points).all())
 
     def test_alt_constraint_in_4d(self):
         from colocate.sepconstraint import SepConstraint
@@ -55,16 +57,15 @@ class TestSepConstraint(unittest.TestCase):
 
         constraint = SepConstraint(a_sep=a_sep)
 
-        # This should leave us with 15 points:  [ 21.  22.  23.  24.  25.]
-        # [ 26.  27.  28.  29.  30.]
-        #                                       [ 31.  32.  33.  34.  35.]
-        ref_vals = np.array([21., 22., 23., 24., 25., 26., 27., 28., 29., 30., 31., 32., 33., 34., 35.])
+        # This should leave us with 15 points:
+        ref_vals = np.array([[21., 22., 23., 24., 25.],
+                             [26., 27., 28., 29., 30.],
+                             [31., 32., 33., 34., 35.]])
 
         new_points = constraint.constrain_points(sample_point, ug_data)
-        new_vals = new_points.vals
 
-        eq_(ref_vals.size, new_vals.size)
-        assert (np.equal(ref_vals, new_vals).all())
+        eq_(ref_vals.size, new_points.size)
+        assert (np.equal(ref_vals, new_points).all())
 
     def test_horizontal_constraint_in_4d(self):
         from colocate.sepconstraint import SepConstraint
@@ -79,14 +80,16 @@ class TestSepConstraint(unittest.TestCase):
         # in each direction
         constraint = SepConstraint(h_sep=1000)
 
+        # Create the index
+        constraint.index_data(ug_data)
+
         # This should leave us with 30 points
-        ref_vals = np.reshape(np.arange(50) + 1.0, (10, 5))[:, 1:4].flatten()
+        ref_vals = np.reshape(np.arange(50) + 1.0, (10, 5))[:, 1:4]
 
         new_points = constraint.constrain_points(sample_point, ug_data)
-        new_vals = new_points.vals
 
-        eq_(ref_vals.size, new_vals.size)
-        assert (np.equal(ref_vals, new_vals).all())
+        eq_(ref_vals.size, new_points.size)
+        assert (np.equal(ref_vals, new_points).all())
 
     def test_time_constraint_in_4d(self):
         from colocate.sepconstraint import SepConstraint
@@ -98,16 +101,15 @@ class TestSepConstraint(unittest.TestCase):
                                                      time=[dt.datetime(1984, 8, 29)])
 
         # 1 day (and a little bit) time seperation
-        constraint = SepConstraint(t_sep='P1dT1M')
+        constraint = SepConstraint(t_sep=np.timedelta64(1, 'D') + np.timedelta64(1, 'm'))
 
         # This should leave us with 30 points
-        ref_vals = np.reshape(np.arange(50) + 1.0, (10, 5))[:, 1:4].flatten()
+        ref_vals = np.reshape(np.arange(50) + 1.0, (10, 5))[:, 1:4]
 
         new_points = constraint.constrain_points(sample_point, ug_data)
-        new_vals = new_points.vals
 
-        eq_(ref_vals.size, new_vals.size)
-        assert (np.equal(ref_vals, new_vals).all())
+        eq_(ref_vals.size, new_points.size)
+        assert (np.equal(ref_vals, new_points).all())
 
     def test_pressure_constraint_in_4d(self):
         from colocate.sepconstraint import SepConstraint
@@ -120,18 +122,16 @@ class TestSepConstraint(unittest.TestCase):
 
         constraint = SepConstraint(p_sep=2)
 
-        # This should leave us with 20 points:  [  6.   7.   8.   9.  10.]
-        # [ 11.  12.  13.  14.  15.]
-        #                                       [ 16.  17.  18.  19.  20.]
-        #                                       [ 21.  22.  23.  24.  25.]
-        ref_vals = np.array([6., 7., 8., 9., 10., 11., 12., 13., 14., 15., 16., 17., 18., 19., 20., 21., 22., 23.,
-                             24., 25.])
+        # This should leave us with 20 points:
+        ref_vals = np.array([[6., 7., 8., 9., 10.],
+                             [11., 12., 13., 14., 15.],
+                             [16., 17., 18., 19., 20.],
+                             [21., 22., 23., 24., 25.]])
 
         new_points = constraint.constrain_points(sample_point, ug_data)
-        new_vals = new_points.vals
 
-        eq_(ref_vals.size, new_vals.size)
-        assert (np.equal(ref_vals, new_vals).all())
+        eq_(ref_vals.size, new_points.size)
+        assert (np.equal(ref_vals, new_points).all())
 
 
 if __name__ == '__main__':

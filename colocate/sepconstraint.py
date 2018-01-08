@@ -13,7 +13,7 @@ class SepConstraint:
         self.haversine_distance_kd_tree_index = False
 
         self._index_cache = {}
-        self.checks = []
+        self.constraints = []
         if h_sep is not None:
             self.h_sep = h_sep
             self.haversine_distance_kd_tree_index = None
@@ -22,29 +22,35 @@ class SepConstraint:
 
         if a_sep is not None:
             self.a_sep = a_sep
-            self.checks.append(self.alt_constraint)
+            self.constraints.append(self.alt_constraint)
         if p_sep is not None:
             try:
                 self.p_sep = float(p_sep)
             except:
                 raise ValueError('Separation Constraint p_sep must be a valid float')
-            self.checks.append(self.pressure_constraint)
+            self.constraints.append(self.pressure_constraint)
         if t_sep is not None:
             self.t_sep = t_sep
-            self.checks.append(self.time_constraint)
+            self.constraints.append(self.time_constraint)
 
     def time_constraint(self, points, ref_point):
-        return np.nonzero(np.abs(points.time - ref_point.time) < self.t_sep)[0]
+        indices = np.nonzero(np.abs(points.time - ref_point.time) < self.t_sep).values[0]
+        dimension = points.coords['time'].dims[0]
+        return points.sel(**{dimension: indices})
 
     def alt_constraint(self, points, ref_point):
-        return np.nonzero(np.abs(points.altitude - ref_point.altitude) < self.a_sep)[0]
+        indices = np.nonzero(np.abs(points.altitude - ref_point.altitude) < self.a_sep).values[0]
+        dimension = points.coords['altitude'].dims[0]
+        return points.sel(**{dimension: indices})
 
     def pressure_constraint(self, points, ref_point):
-        greater_pressures = np.nonzero(((points.air_pressure / ref_point.air_pressure) < self.p_sep) &
-                                       (points.air_pressure > ref_point.air_pressure))[0]
-        lesser_pressures = np.nonzero(((ref_point.air_pressure / points.air_pressure) < self.p_sep) &
-                                      (points.air_pressure <= ref_point.air_pressure))[0]
-        return np.concatenate([lesser_pressures, greater_pressures])
+        greater_pressures = np.nonzero(((points.air_pressure / ref_point.air_pressure.item()) < self.p_sep) &
+                                       (points.air_pressure > ref_point.air_pressure.item())).values[0]
+        lesser_pressures = np.nonzero(((ref_point.air_pressure.item() / points.air_pressure) < self.p_sep) &
+                                      (points.air_pressure <= ref_point.air_pressure.item())).values[0]
+        indices = np.concatenate([lesser_pressures, greater_pressures])
+        dimension = points.coords['air_pressure'].dims[0]
+        return points.sel(**{dimension: indices})
 
     def constrain_points(self, ref_point, data):
         if self.haversine_distance_kd_tree_index and self.h_sep:
@@ -52,21 +58,22 @@ class SepConstraint:
             if point_indices is None:
                 point_indices = self.haversine_distance_kd_tree_index.find_points_within_distance(ref_point, self.h_sep)
                 self._add_cached_indices(ref_point, point_indices)
-            con_points = data.iloc[point_indices]
+            dimension = data.coords['longitude'].dims[0]
+            con_points = data.sel(**{dimension: point_indices})
         else:
             con_points = data
-        for check in self.checks:
-            con_points = con_points.iloc[check(con_points, ref_point)]
+        for constrain in self.constraints:
+            con_points = constrain(con_points, ref_point)
 
         return con_points
 
     def _get_cached_indices(self, ref_point):
         # Don't use the value as a key (it's both irrelevant and un-hashable)
-        return self._index_cache.get(tuple(ref_point[['latitude', 'longitude']].values), None)
+        return self._index_cache.get((ref_point.latitude.item(), ref_point.longitude.item()), None)
 
     def _add_cached_indices(self, ref_point, indices):
         # Don't use the value as a key (it's both irrelevant and un-hashable)
-        self._index_cache[tuple(ref_point[['latitude', 'longitude']].values)] = indices
+        self._index_cache[(ref_point.latitude.item(), ref_point.longitude.item())] = indices
 
     def get_iterator(self, missing_data_for_missing_sample, data_points, points):
         indices = False
@@ -83,7 +90,7 @@ class SepConstraint:
                 d_points = data_points[indices[i]]
             else:
                 d_points = data_points
-            for check in self.checks:
+            for check in self.constraints:
                 con_points_indices = check(d_points, p)
                 d_points = d_points[con_points_indices]
 
@@ -99,7 +106,9 @@ class SepConstraint:
         from colocate.haversinedistancekdtreeindex import HaversineDistanceKDTreeIndex
         from colocate.utils import get_lat_lon_names
 
-        lat_lon_points = data.to_dataframe(data.name or 'unknown').loc[:, get_lat_lon_names(data)]
+        # lat_lon_points = data.to_dataframe(data.name or 'unknown').loc[:, get_lat_lon_names(data)]
+        lat_lon_points =  np.column_stack((data.latitude.values.ravel(),
+                                           data.longitude.values.ravel()))
         self.haversine_distance_kd_tree_index = HaversineDistanceKDTreeIndex(lat_lon_points, leafsize)
 
 

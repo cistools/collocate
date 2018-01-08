@@ -36,7 +36,7 @@ def collocate(sample, data, kernel=None, index=None, fill_value=None, missing_da
             output.update(collocate(sample, var, kernel, index))
         return output
 
-    index.index_data(sample)
+    index.index_data(data)
 
     logging.info("--> Collocating...")
 
