@@ -18,7 +18,7 @@ class TestFullAverage(unittest.TestCase):
 
         ug_data = mock.make_regular_4d_ungridded_data()
         # Note - This isn't actually used for averaging
-        sample_points = mock.make_dummy_sample_points(lat=[1.0], lon=[1.0], alt=[12.0],
+        sample_points = mock.make_dummy_sample_points(latitude=[1.0], longitude=[1.0], altitude=[12.0],
                                                       time=[dt.datetime(1984, 8, 29, 8, 34)])
 
         new_data = collocate(sample_points, ug_data, moments())
@@ -37,7 +37,7 @@ class TestFullAverage(unittest.TestCase):
 
         ug_data = mock.make_regular_4d_ungridded_data()
         # Note - This isn't actually used for averaging
-        sample_points = mock.make_dummy_sample_points(lat=[1.0], lon=[1.0], alt=[12.0],
+        sample_points = mock.make_dummy_sample_points(latitude=[1.0], longitude=[1.0], altitude=[12.0],
                                                       time=[dt.datetime(1984, 8, 29, 8, 34)])
 
         new_data = collocate(sample_points, ug_data, moments())
@@ -56,8 +56,8 @@ class TestNNHorizontal(unittest.TestCase):
         from colocate import collocate
 
         ug_data = mock.make_regular_2d_ungridded_data()
-        sample_points = mock.make_dummy_sample_points(lat=[1.0, 4.0, -4.0], lon=[1.0, 4.0, -4.0])
-        new_data = collocate(sample_points, ug_data, nn_horizontal())[0]
+        sample_points = mock.make_dummy_sample_points(latitude=[1.0, 4.0, -4.0], longitude=[1.0, 4.0, -4.0])
+        new_data = collocate(sample_points, ug_data, nn_horizontal())['var']
         eq_(new_data.data[0], 8.0)
         eq_(new_data.data[1], 12.0)
         eq_(new_data.data[2], 4.0)
@@ -68,8 +68,8 @@ class TestNNHorizontal(unittest.TestCase):
 
         ug_data = mock.make_regular_2d_ungridded_data()
         # This point already exists on the cube with value 5 - which shouldn't be a problem
-        sample_points = mock.make_dummy_sample_points(lat=[0.0], lon=[0.0])
-        new_data = collocate(sample_points, ug_data, nn_horizontal())[0]
+        sample_points = mock.make_dummy_sample_points(latitude=[0.0], longitude=[0.0])
+        new_data = collocate(sample_points, ug_data, nn_horizontal())['var']
         eq_(new_data.data[0], 8.0)
 
     def test_coordinates_exactly_between_points_in_col_ungridded_to_ungridded_in_2d(self):
@@ -85,8 +85,8 @@ class TestNNHorizontal(unittest.TestCase):
         from colocate import collocate
 
         ug_data = mock.make_regular_2d_ungridded_data()
-        sample_points = mock.make_dummy_sample_points(lat=[2.5, -2.5, 2.5, -2.5], lon=[2.5, 2.5, -2.5, -2.5])
-        new_data = collocate(sample_points, ug_data, nn_horizontal())[0]
+        sample_points = mock.make_dummy_sample_points(latitude=[2.5, -2.5, 2.5, -2.5], longitude=[2.5, 2.5, -2.5, -2.5])
+        new_data = collocate(sample_points, ug_data, nn_horizontal())['var']
         eq_(new_data.data[0], 11.0)
         eq_(new_data.data[1], 5.0)
         eq_(new_data.data[2], 10.0)
@@ -97,8 +97,8 @@ class TestNNHorizontal(unittest.TestCase):
         from colocate import collocate
 
         ug_data = mock.make_regular_2d_ungridded_data()
-        sample_points = mock.make_dummy_sample_points(lat=[5.5, -5.5, 5.5, -5.5], lon=[5.5, 5.5, -5.5, -5.5])
-        new_data = collocate(sample_points, ug_data, nn_horizontal())[0]
+        sample_points = mock.make_dummy_sample_points(latitude=[5.5, -5.5, 5.5, -5.5], longitude=[5.5, 5.5, -5.5, -5.5])
+        new_data = collocate(sample_points, ug_data, nn_horizontal())['var']
         eq_(new_data.data[0], 12.0)
         eq_(new_data.data[1], 6.0)
         eq_(new_data.data[2], 10.0)
@@ -112,7 +112,7 @@ class TestNNTime(unittest.TestCase):
 
         ug_data = mock.make_regular_2d_with_time_ungridded_data()
         # Make sample points with no time dimension specified
-        sample_points = mock.make_dummy_sample_points(lat=[1.0, 4.0, -4.0], lon=[1.0, 4.0, -4.0])
+        sample_points = mock.make_dummy_sample_points(latitude=[1.0, 4.0, -4.0], longitude=[1.0, 4.0, -4.0])
         with self.assertRaises(AttributeError):
             new_data = collocate(sample_points, ug_data, nn_time())['var']
 
@@ -122,7 +122,7 @@ class TestNNTime(unittest.TestCase):
         import datetime as dt
 
         ug_data = mock.make_regular_2d_with_time_ungridded_data()
-        sample_points = mock.make_dummy_sample_points(lat=[1.0, 4.0, -4.0], lon=[1.0, 4.0, -4.0],
+        sample_points = mock.make_dummy_sample_points(latitude=[1.0, 4.0, -4.0], longitude=[1.0, 4.0, -4.0],
                                                       time=np.asarray([dt.datetime(1984, 8, 29, 8, 34),
                                                             dt.datetime(1984, 9, 2, 1, 23),
                                                             dt.datetime(1984, 9, 4, 15, 54)],
@@ -138,10 +138,10 @@ class TestNNTime(unittest.TestCase):
         from colocate import collocate
         import numpy as np
 
-        data = mock.make_dummy_sample_points(data=np.arange(4.0), lat=[0.0, 0.0, 0.0, 0.0], lon=[0.0, 0.0, 0.0, 0.0],
+        data = mock.make_dummy_sample_points(data=np.arange(4.0), latitude=[0.0, 0.0, 0.0, 0.0], longitude=[0.0, 0.0, 0.0, 0.0],
                                              time=[149754, 149762, 149770, 149778])
 
-        sample_points = mock.make_dummy_sample_points(lat=[0.0, 0.0, 0.0, 0.0], lon=[0.0, 0.0, 0.0, 0.0],
+        sample_points = mock.make_dummy_sample_points(latitude=[0.0, 0.0, 0.0, 0.0], longitude=[0.0, 0.0, 0.0, 0.0],
                                                       time=[149751.369618055, 149759.378055556, 149766.373969907,
                                                             149776.375995371])
 
@@ -158,7 +158,7 @@ class TestNNTime(unittest.TestCase):
 
         ug_data = mock.make_regular_2d_with_time_ungridded_data()
 
-        sample_points = mock.make_dummy_sample_points(lat=[0.0]*15, lon=[0.0]*15,
+        sample_points = mock.make_dummy_sample_points(latitude=[0.0]*15, longitude=[0.0]*15,
                                                       time=[dt.datetime(1984, 8, 27) +
                                                             dt.timedelta(days=d) for d in range(15)])
 
@@ -178,7 +178,7 @@ class TestNNTime(unittest.TestCase):
 
         ug_data = mock.make_regular_2d_with_time_ungridded_data()
         # Choose a time at midday
-        sample_points = mock.make_dummy_sample_points(lat=[0.0], lon=[0.0], time=[dt.datetime(1984, 8, 29, 12)])
+        sample_points = mock.make_dummy_sample_points(latitude=[0.0], longitude=[0.0], time=[dt.datetime(1984, 8, 29, 12)])
         new_data = collocate(sample_points, ug_data, nn_time())['var']
         eq_(new_data.data[0], 3.0)
 
@@ -188,7 +188,7 @@ class TestNNTime(unittest.TestCase):
         import datetime as dt
 
         ug_data = mock.make_regular_2d_with_time_ungridded_data()
-        sample_points = mock.make_dummy_sample_points(lat=[0.0, 0.0, 0.0], lon=[0.0, 0.0, 0.0],
+        sample_points = mock.make_dummy_sample_points(latitude=[0.0, 0.0, 0.0], longitude=[0.0, 0.0, 0.0],
                                                       time=[dt.datetime(1984, 8, 26),
                                                             dt.datetime(1984, 8, 26),
                                                             dt.datetime(1984, 8, 27)])
@@ -205,7 +205,7 @@ class TestNNAltitude(unittest.TestCase):
 
         ug_data = mock.make_regular_4d_ungridded_data()
         # Make sample points with no time dimension specified
-        sample_points = mock.make_dummy_sample_points(lat=[1.0, 4.0, -4.0], lon=[1.0, 4.0, -4.0])
+        sample_points = mock.make_dummy_sample_points(latitude=[1.0, 4.0, -4.0], longitude=[1.0, 4.0, -4.0])
         with self.assertRaises(AttributeError):
             new_data = collocate(sample_points, ug_data, nn_altitude())['var']
 
@@ -215,12 +215,12 @@ class TestNNAltitude(unittest.TestCase):
         import datetime as dt
 
         ug_data = mock.make_regular_4d_ungridded_data()
-        sample_points = mock.make_dummy_sample_points(lat=[1.0, 4.0, -4.0], lon=[1.0, 4.0, -4.0],
-                                                      alt=[12.0, 34.0, 89.0],
+        sample_points = mock.make_dummy_sample_points(latitude=[1.0, 4.0, -4.0], longitude=[1.0, 4.0, -4.0],
+                                                      altitude=[12.0, 34.0, 89.0],
                                                       time=[dt.datetime(1984, 8, 29, 8, 34),
                                                             dt.datetime(1984, 9, 2, 1, 23),
                                                             dt.datetime(1984, 9, 4, 15, 54)])
-        new_data = collocate(sample_points, ug_data, nn_altitude())[0]
+        new_data = collocate(sample_points, ug_data, nn_altitude())['var']
         eq_(new_data.data[0], 6.0)
         eq_(new_data.data[1], 16.0)
         eq_(new_data.data[2], 46.0)
@@ -231,7 +231,7 @@ class TestNNAltitude(unittest.TestCase):
         import datetime as dt
 
         ug_data = mock.make_regular_4d_ungridded_data()
-        sample_points = mock.make_dummy_sample_points(lat=[0.0], lon=[0.0], alt=[80.0],
+        sample_points = mock.make_dummy_sample_points(latitude=[0.0], longitude=[0.0], altitude=[80.0],
                                                       time=[dt.datetime(1984, 9, 4, 15, 54)])
         new_data = collocate(sample_points, ug_data, nn_altitude())['var']
         eq_(new_data.data[0], 41.0)
@@ -249,10 +249,10 @@ class TestNNAltitude(unittest.TestCase):
 
         ug_data = mock.make_regular_4d_ungridded_data()
         # Choose a time at midday
-        sample_points = mock.make_dummy_sample_points(lat=[0.0], lon=[0.0], alt=[35.0],
+        sample_points = mock.make_dummy_sample_points(latitude=[0.0], longitude=[0.0], altitude=[35.0],
                                                       time=[dt.datetime(1984, 8, 29, 12)])
 
-        new_data = collocate(sample_points, ug_data, nn_altitude())[0]
+        new_data = collocate(sample_points, ug_data, nn_altitude())['var']
         eq_(new_data.data[0], 16.0)
 
     def test_coordinates_outside_grid_in_col_ungridded_to_ungridded_in_2d(self):
@@ -261,14 +261,14 @@ class TestNNAltitude(unittest.TestCase):
         import datetime as dt
 
         ug_data = mock.make_regular_4d_ungridded_data()
-        sample_points = mock.make_dummy_sample_points(lat=[0.0, 0.0, 0.0], lon=[0.0, 0.0, 0.0],
-                                                      alt=[-12.0, 91.0, 890.0],
+        sample_points = mock.make_dummy_sample_points(latitude=[0.0, 0.0, 0.0], longitude=[0.0, 0.0, 0.0],
+                                                      altitude=[-12.0, 91.0, 890.0],
                                                       time=[dt.datetime(1984, 8, 29, 8, 34),
                                                             dt.datetime(1984, 9, 2, 1, 23),
                                                             dt.datetime(1984, 9, 4, 15, 54)])
 
 
-        new_data = collocate(sample_points, ug_data, nn_altitude())[0]
+        new_data = collocate(sample_points, ug_data, nn_altitude())['var']
         eq_(new_data.data[0], 1.0)
         eq_(new_data.data[1], 46.0)
         eq_(new_data.data[2], 46.0)
@@ -281,10 +281,10 @@ class TestNNPressure(unittest.TestCase):
 
         ug_data = mock.make_regular_4d_ungridded_data()
         # Make sample points with no time dimension specified
-        sample_points = mock.make_dummy_sample_points(lat=[1.0, 4.0, -4.0], lon=[1.0, 4.0, -4.0])
+        sample_points = mock.make_dummy_sample_points(latitude=[1.0, 4.0, -4.0], longitude=[1.0, 4.0, -4.0])
 
         with self.assertRaises(AttributeError):
-            new_data = collocate(sample_points, ug_data, nn_pressure())[0]
+            new_data = collocate(sample_points, ug_data, nn_pressure())['var']
 
     def test_basic_col_in_4d(self):
         from colocate.kernels import nn_pressure
@@ -292,13 +292,13 @@ class TestNNPressure(unittest.TestCase):
         import datetime as dt
 
         ug_data = mock.make_regular_4d_ungridded_data()
-        sample_points = mock.make_dummy_sample_points(lat=[1.0, 4.0, -4.0], lon=[1.0, 4.0, -4.0],
-                                                      pres=[12.0, 34.0, 89.0],
+        sample_points = mock.make_dummy_sample_points(latitude=[1.0, 4.0, -4.0], longitude=[1.0, 4.0, -4.0],
+                                                      air_pressure=[12.0, 34.0, 89.0],
                                                       time=[dt.datetime(1984, 8, 29, 8, 34),
                                                             dt.datetime(1984, 9, 2, 1, 23),
                                                             dt.datetime(1984, 9, 4, 15, 54)])
 
-        new_data = collocate(sample_points, ug_data, nn_pressure())[0]
+        new_data = collocate(sample_points, ug_data, nn_pressure())['var']
         eq_(new_data.data[0], 6.0)
         eq_(new_data.data[1], 16.0)
         eq_(new_data.data[2], 46.0)
@@ -309,10 +309,10 @@ class TestNNPressure(unittest.TestCase):
         import datetime as dt
 
         ug_data = mock.make_regular_4d_ungridded_data()
-        sample_points = mock.make_dummy_sample_points(lat=[0.0], lon=[0.0], pres=[80.0],
+        sample_points = mock.make_dummy_sample_points(latitude=[0.0], longitude=[0.0], air_pressure=[80.0],
                                                       time=[dt.datetime(1984, 9, 4, 15, 54)])
 
-        new_data = collocate(sample_points, ug_data, nn_pressure())[0]
+        new_data = collocate(sample_points, ug_data, nn_pressure())['var']
         eq_(new_data.data[0], 41.0)
 
     def test_coordinates_exactly_between_points_in_col_ungridded_to_ungridded_in_2d(self):
@@ -328,10 +328,10 @@ class TestNNPressure(unittest.TestCase):
 
         ug_data = mock.make_regular_4d_ungridded_data()
         # Choose a time at midday
-        sample_points = mock.make_dummy_sample_points(lat=[0.0], lon=[0.0], pres=[8.0],
+        sample_points = mock.make_dummy_sample_points(latitude=[0.0], longitude=[0.0], air_pressure=[8.0],
                                                       time=[dt.datetime(1984, 8, 29, 12)])
 
-        new_data = collocate(sample_points, ug_data, nn_pressure())[0]
+        new_data = collocate(sample_points, ug_data, nn_pressure())['var']
         eq_(new_data.data[0], 1.0)
 
     def test_coordinates_outside_grid_in_col_ungridded_to_ungridded_in_2d(self):
@@ -340,13 +340,13 @@ class TestNNPressure(unittest.TestCase):
         import datetime as dt
 
         ug_data = mock.make_regular_4d_ungridded_data()
-        sample_points = mock.make_dummy_sample_points(lat=[0.0, 0.0, 0.0], lon=[0.0, 0.0, 0.0],
-                                                      pres=[0.1, 91.0, 890.0],
+        sample_points = mock.make_dummy_sample_points(latitude=[0.0, 0.0, 0.0], longitude=[0.0, 0.0, 0.0],
+                                                      air_pressure=[0.1, 91.0, 890.0],
                                                       time=[dt.datetime(1984, 8, 29, 8, 34),
                                                             dt.datetime(1984, 9, 2, 1, 23),
                                                             dt.datetime(1984, 9, 4, 15, 54)])
 
-        new_data = collocate(sample_points, ug_data, nn_pressure())[0]
+        new_data = collocate(sample_points, ug_data, nn_pressure())['var']
         eq_(new_data.data[0], 1.0)
         eq_(new_data.data[1], 46.0)
         eq_(new_data.data[2], 46.0)
@@ -360,11 +360,11 @@ class TestMean(unittest.TestCase):
 
         ug_data = mock.make_regular_4d_ungridded_data()
         # Note - This isn't actually used for averaging
-        sample_points = mock.make_dummy_sample_points(lat=[1.0], lon=[1.0], alt=[12.0],
+        sample_points = mock.make_dummy_sample_points(latitude=[1.0], longitude=[1.0], altitude=[12.0],
                                                       time=[dt.datetime(1984, 8, 29, 8, 34)])
 
 
-        new_data = collocate(sample_points, ug_data, mean())[0]
+        new_data = collocate(sample_points, ug_data, mean())['var']
         eq_(new_data.data[0], 25.5)
 
 

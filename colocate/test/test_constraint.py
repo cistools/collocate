@@ -15,8 +15,8 @@ class TestSepConstraint(unittest.TestCase):
         import numpy as np
 
         ug_data = mock.make_regular_4d_ungridded_data()
-        ug_data_points = ug_data.get_non_masked_points()
-        sample_point = mock.make_dummy_sample_points(lat=[0.0], lon=[0.0], alt=[50.0], pres=[50.0],
+        sample_point = mock.make_dummy_sample_points(latitude=[0.0], longitude=[0.0],
+                                                     altitude=[50.0], air_pressure=[50.0],
                                                      time=[dt.datetime(1984, 8, 29)])
         # One degree near 0, 0 is about 110km in latitude and longitude, so 300km should keep us to within 3 degrees
         # in each direction
@@ -35,7 +35,7 @@ class TestSepConstraint(unittest.TestCase):
         #                                      [ 32, 33, 34]]
         ref_vals = np.array([27., 28., 29., 32., 33., 34.])
 
-        new_points = constraint.constrain_points(sample_point, ug_data_points)
+        new_points = constraint.constrain_points(sample_point, ug_data)
         new_vals = new_points.vals
 
         eq_(ref_vals.size, new_vals.size)
@@ -47,8 +47,7 @@ class TestSepConstraint(unittest.TestCase):
         import numpy as np
 
         ug_data = mock.make_regular_4d_ungridded_data()
-        ug_data_points = ug_data.get_non_masked_points()
-        sample_point = mock.make_dummy_sample_points(lat=[0.0], lon=[0.0], alt=[50.0],
+        sample_point = mock.make_dummy_sample_points(latitude=[0.0], longitude=[0.0], altitude=[50.0],
                                                      time=[dt.datetime(1984, 8, 29)])
 
         # 15m altitude seperation
@@ -61,7 +60,7 @@ class TestSepConstraint(unittest.TestCase):
         #                                       [ 31.  32.  33.  34.  35.]
         ref_vals = np.array([21., 22., 23., 24., 25., 26., 27., 28., 29., 30., 31., 32., 33., 34., 35.])
 
-        new_points = constraint.constrain_points(sample_point, ug_data_points)
+        new_points = constraint.constrain_points(sample_point, ug_data)
         new_vals = new_points.vals
 
         eq_(ref_vals.size, new_vals.size)
@@ -73,8 +72,7 @@ class TestSepConstraint(unittest.TestCase):
         import numpy as np
 
         ug_data = mock.make_regular_4d_ungridded_data()
-        ug_data_points = ug_data.get_non_masked_points()
-        sample_point = mock.make_dummy_sample_points(lat=[0.0], lon=[0.0], alt=[50.0],
+        sample_point = mock.make_dummy_sample_points(latitude=[0.0], longitude=[0.0], altitude=[50.0],
                                                      time=[dt.datetime(1984, 8, 29)])
 
         # One degree near 0, 0 is about 110km in latitude and longitude, so 300km should keep us to within 3 degrees
@@ -84,7 +82,7 @@ class TestSepConstraint(unittest.TestCase):
         # This should leave us with 30 points
         ref_vals = np.reshape(np.arange(50) + 1.0, (10, 5))[:, 1:4].flatten()
 
-        new_points = constraint.constrain_points(sample_point, ug_data_points)
+        new_points = constraint.constrain_points(sample_point, ug_data)
         new_vals = new_points.vals
 
         eq_(ref_vals.size, new_vals.size)
@@ -96,8 +94,7 @@ class TestSepConstraint(unittest.TestCase):
         import numpy as np
 
         ug_data = mock.make_regular_4d_ungridded_data()
-        ug_data_points = ug_data.get_non_masked_points()
-        sample_point = mock.make_dummy_sample_points(lat=[0.0], lon=[0.0], alt=[50.0],
+        sample_point = mock.make_dummy_sample_points(latitude=[0.0], longitude=[0.0], altitude=[50.0],
                                                      time=[dt.datetime(1984, 8, 29)])
 
         # 1 day (and a little bit) time seperation
@@ -106,7 +103,7 @@ class TestSepConstraint(unittest.TestCase):
         # This should leave us with 30 points
         ref_vals = np.reshape(np.arange(50) + 1.0, (10, 5))[:, 1:4].flatten()
 
-        new_points = constraint.constrain_points(sample_point, ug_data_points)
+        new_points = constraint.constrain_points(sample_point, ug_data)
         new_vals = new_points.vals
 
         eq_(ref_vals.size, new_vals.size)
@@ -118,9 +115,8 @@ class TestSepConstraint(unittest.TestCase):
         import numpy as np
 
         ug_data = mock.make_regular_4d_ungridded_data()
-        ug_data_points = ug_data.get_non_masked_points()
-        sample_point = mock.make_dummy_sample_points(lat=[0.0], lon=[0.0], alt=[50.0], pres=[24.0],
-                                                     time=[dt.datetime(1984, 8, 29)])
+        sample_point = mock.make_dummy_sample_points(latitude=[0.0], longitude=[0.0], altitude=[50.0],
+                                                     air_pressure=[24.0], time=[dt.datetime(1984, 8, 29)])
 
         constraint = SepConstraint(p_sep=2)
 
@@ -131,7 +127,7 @@ class TestSepConstraint(unittest.TestCase):
         ref_vals = np.array([6., 7., 8., 9., 10., 11., 12., 13., 14., 15., 16., 17., 18., 19., 20., 21., 22., 23.,
                              24., 25.])
 
-        new_points = constraint.constrain_points(sample_point, ug_data_points)
+        new_points = constraint.constrain_points(sample_point, ug_data)
         new_vals = new_points.vals
 
         eq_(ref_vals.size, new_vals.size)

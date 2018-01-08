@@ -10,6 +10,7 @@ import numpy as np
 from colocate.kernels import moments
 from colocate import collocate
 from colocate.test import mock
+import xarray as xr
 
 
 class TestGeneralUngriddedCollocator(unittest.TestCase):
@@ -46,7 +47,7 @@ class TestGeneralUngriddedCollocator(unittest.TestCase):
         expected_stddev = np.array([1.52752523, 1.82574186, 1.52752523])
         expected_n = np.array([3, 4, 3])
         assert len(output) == 3
-        assert isinstance(output, DataList)
+        assert isinstance(output, xr.Dataset)
         assert np.allclose(output[0].data, expected_result)
         assert np.allclose(output[1].data, expected_stddev)
         assert np.allclose(output[2].data, expected_n)
@@ -66,7 +67,7 @@ class TestGeneralUngriddedCollocator(unittest.TestCase):
         output = collocate(sample, data, kernel, h_sep='500km', missing_data_for_missing_sample=True)
 
         assert len(output) == 3
-        assert isinstance(output, DataList)
+        assert isinstance(output, xr.Dataset)
         assert np.array_equal(output[0].data.mask, sample_mask)
         assert np.array_equal(output[1].data.mask, sample_mask)
         assert np.array_equal(output[2].data.mask, sample_mask)
@@ -86,7 +87,7 @@ class TestGeneralUngriddedCollocator(unittest.TestCase):
         output = collocate(sample, data, kernel, h_sep='500km', missing_data_for_missing_sample=False)
 
         assert len(output) == 3
-        assert isinstance(output, DataList)
+        assert isinstance(output, xr.Dataset)
         assert not any(output[0].data.mask)
         assert not any(output[1].data.mask)
         assert not any(output[2].data.mask)
@@ -94,11 +95,10 @@ class TestGeneralUngriddedCollocator(unittest.TestCase):
     def test_list_ungridded_ungridded_box_mean(self):
         ug_data_1 = mock.make_regular_2d_ungridded_data()
         ug_data_2 = mock.make_regular_2d_ungridded_data(data_offset=3)
-        ug_data_2.long_name = 'TOTAL SNOWFALL RATE: LS+CONV KG/M2/S'
-        ug_data_2.standard_name = 'snowfall_flux'
-        ug_data_2.var_name = 'snow'
+        ug_data_2.attrs['long_name'] = 'TOTAL SNOWFALL RATE: LS+CONV KG/M2/S'
+        ug_data_2.attrs['standard_name'] = 'snowfall_flux'
 
-        data_list = DataList([ug_data_1, ug_data_2])
+        data_list = xr.Dataset({'precip': ug_data_1, 'snow': ug_data_2})
         sample_points = mock.make_regular_2d_ungridded_data()
         kernel = moments()
         output = collocate(sample_points, data_list, kernel, h_sep='500km')
@@ -106,7 +106,7 @@ class TestGeneralUngriddedCollocator(unittest.TestCase):
         expected_result = np.array(list(range(1, 16)))
         expected_n = np.array(15 * [1])
         assert len(output) == 6
-        assert isinstance(output, DataList)
+        assert isinstance(output, xr.Dataset)
         assert output[3].var_name == 'snow'
         assert output[4].var_name == 'snow_std_dev'
         assert output[5].var_name == 'snow_num_points'
@@ -116,6 +116,7 @@ class TestGeneralUngriddedCollocator(unittest.TestCase):
         assert np.allclose(output[3].data, expected_result + 3)
         assert all(output[4].data.mask)
         assert np.allclose(output[5].data, expected_n)
+
 
 if __name__ == '__main__':
     import nose
