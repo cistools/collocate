@@ -76,26 +76,35 @@ class SepConstraint:
         self._index_cache[(ref_point.latitude.item(), ref_point.longitude.item())] = indices
 
     def get_iterator(self, missing_data_for_missing_sample, data_points, points):
-        indices = False
+        cell_count = 0
+        total_count = 0
+        sample_points_count = len(points)
 
-        iterator = index_iterator_nditer(points, not missing_data_for_missing_sample)
+        indices = None
 
         if self.haversine_distance_kd_tree_index and self.h_sep:
-            indices = self.haversine_distance_kd_tree_index.find_points_within_distance_sample(points, self.h_sep)
+            points['indices'] = self.haversine_distance_kd_tree_index.find_points_within_distance_sample(points, self.h_sep)
 
-        for i in iterator:
-            p = points[i]
-            if indices:
-                # dimension = data_points.coords['longitude'].dims[0]
-                # d_points = data_points.sel(**{dimension: indices[i]})
-                d_points = data_points[indices[i]]
-            else:
-                d_points = data_points
-            for check in self.constraints:
-                con_points_indices = check(d_points, p)
-                d_points = d_points[con_points_indices]
+        for i, p in points.iterrows():
 
-            yield i, p, d_points
+            # Log progress periodically.
+            cell_count += 1
+            if cell_count == 1000:
+                total_count += cell_count
+                cell_count = 0
+                logging.info("    Processed {} points of {}".format(total_count, sample_points_count))
+
+            # If missing_data_for_missing_sample
+            if not (missing_data_for_missing_sample and (hasattr(p, 'vals') and np.isnan(p.vals))):
+                if hasattr(p, 'indices'):
+                    # Note that data_points has to be a dataframe at this point because of the indexing
+                    d_points = data_points.iloc[p.indices]
+                else:
+                    d_points = data_points
+                for check in self.constraints:
+                    d_points = d_points.iloc[check(d_points, p)]
+
+                yield i, p, d_points
 
     def index_data(self, data, leafsize=10):
         """
@@ -110,6 +119,7 @@ class SepConstraint:
         # lat_lon_points = data.to_dataframe(data.name or 'unknown').loc[:, get_lat_lon_names(data)]
         lat_lon_points = np.column_stack((data.latitude.values.ravel(),
                                            data.longitude.values.ravel()))
+        # data[['latitude', 'longitude']]
         self.haversine_distance_kd_tree_index = HaversineDistanceKDTreeIndex(lat_lon_points, leafsize)
 
 

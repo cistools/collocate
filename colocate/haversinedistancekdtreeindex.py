@@ -28,7 +28,7 @@ class HaversineDistanceKDTreeIndex(object):
         :param distance: distance in kilometres
         :return: list indices in data of points
         """
-        query_pt = [[point.latitude.item(), point.longitude.item()]]
+        query_pt = point[['latitude', 'longitude']]
         return self.index.query_ball_point(query_pt, distance)[0]
 
     def find_points_within_distance_sample(self, sample, distance):
@@ -39,7 +39,5 @@ class HaversineDistanceKDTreeIndex(object):
         For each element ``self.data[i]`` of this tree, ``results[i]`` is a
             list of the indices of its neighbors in ``other.data``.
         """
-        import numpy as np
-        points = np.column_stack((sample.latitude.values.ravel(),
-                                  sample.longitude.values.ravel()))
+        points = sample[['latitude', 'longitude']]
         return HaversineDistanceKDTree(points).query_ball_tree(self.index, distance)

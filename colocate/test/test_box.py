@@ -43,7 +43,6 @@ class TestGeneralUngriddedCollocator(unittest.TestCase):
         expected_result = np.array([28.0/3, 10.0, 20.0/3])
         expected_stddev = np.array([1.52752523, 1.82574186, 1.52752523])
         expected_n = np.array([3, 4, 3])
-        assert len(output) == 3
         assert isinstance(output, xr.Dataset)
         assert np.allclose(output['var'].data, expected_result)
         assert np.allclose(output['var_std_dev'].data, expected_stddev)
@@ -63,7 +62,6 @@ class TestGeneralUngriddedCollocator(unittest.TestCase):
 
         output = collocate(sample, data, kernel, h_sep=500, missing_data_for_missing_sample=True)
 
-        assert len(output) == 3
         assert isinstance(output, xr.Dataset)
         assert np.array_equal(output['var'].data.mask, sample_mask)
         assert np.array_equal(output['var_std_dev'].data.mask, sample_mask)
@@ -83,7 +81,6 @@ class TestGeneralUngriddedCollocator(unittest.TestCase):
 
         output = collocate(sample, data, kernel, h_sep=500, missing_data_for_missing_sample=False)
 
-        assert len(output) == 3
         assert isinstance(output, xr.Dataset)
         assert not any(output['var'].data.mask)
         assert not any(output['var_std_dev'].data.mask)
@@ -104,11 +101,10 @@ class TestGeneralUngriddedCollocator(unittest.TestCase):
 
         expected_result = np.array(list(range(1, 16)))
         expected_n = np.array(15 * [1])
-        assert len(output) == 6
         assert isinstance(output, xr.Dataset)
-        assert output[3].var_name == 'snow'
-        assert output[4].var_name == 'snow_std_dev'
-        assert output[5].var_name == 'snow_num_points'
+        assert output['snow'].name == 'snow'
+        assert output['snow_std_dev'].name == 'snow_std_dev'
+        assert output['snow_num_points'].name == 'snow_num_points'
         assert np.allclose(output['var'].data, expected_result)
         assert all(output['var_std_dev'].data.mask)
         assert np.allclose(output['var_num_points'].data, expected_n)
