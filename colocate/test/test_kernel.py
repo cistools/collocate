@@ -32,7 +32,6 @@ class TestFullAverage(unittest.TestCase):
 
     def test_basic_col_in_4d_with_pressure_not_altitude(self):
         from colocate.kernels import moments
-        from colocate.sepconstraint import SepConstraint
         from colocate import collocate
         import datetime as dt
 
@@ -137,15 +136,16 @@ class TestNNTime(unittest.TestCase):
         from colocate import collocate
         import numpy as np
 
-        ug_data = mock.make_MODIS_time_steps()
-
-        ref = np.array([0.0, 1.0, 2.0, 3.0])
+        data = mock.make_dummy_sample_points(lat=[0.0, 0.0, 0.0, 0.0], lon=[0.0, 0.0, 0.0, 0.0],
+                                             time=[149754, 149762, 149770, 149778])
 
         sample_points = mock.make_dummy_sample_points(lat=[0.0, 0.0, 0.0, 0.0], lon=[0.0, 0.0, 0.0, 0.0],
                                                       time=[149751.369618055, 149759.378055556, 149766.373969907,
                                                             149776.375995371])
 
-        new_data = collocate(sample_points, ug_data, nn_time())[0]
+        ref = np.array([0.0, 1.0, 2.0, 3.0])
+
+        new_data = collocate(sample_points, data, nn_time())[0]
         assert (np.equal(new_data.data, ref).all())
 
     def test_already_collocated_in_col_ungridded_to_ungridded_in_2d(self):

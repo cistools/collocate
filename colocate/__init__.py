@@ -4,7 +4,6 @@ import numpy as np
 from xarray import Dataset, DataArray
 
 from colocate.sepconstraint import SepConstraint
-from colocate.utils import get_kernel
 from colocate.kernels import nn_horizontal_kdtree
 
 __version__ = '0.0.1'
@@ -28,7 +27,6 @@ def collocate(sample, data, kernel=None, index=None, fill_value=None, missing_da
     """
     index = index or SepConstraint(**kwargs)
     # We can have any kernel, default to moments
-    kernel = get_kernel(kernel)
 
     if isinstance(data, list):
         # Indexing and constraints (for SepConstraintKdTree) will only take place on the first iteration,
@@ -38,9 +36,7 @@ def collocate(sample, data, kernel=None, index=None, fill_value=None, missing_da
             output.extend(collocate(sample, var, index, kernel))
         return output
 
-    # Create index if constraint and/or kernel require one.
-    coord_map = None
-    index.index_data(sample, data, coord_map)
+    index.index_data(sample)
 
     logging.info("--> Collocating...")
 

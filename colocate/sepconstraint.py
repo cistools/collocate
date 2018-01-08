@@ -89,6 +89,16 @@ class SepConstraint:
 
             yield i, p, d_points
 
+    def index_data(self, data, leafsize=10):
+        """
+        Creates the k-D tree index.
+
+        :param DataArray data: points to index
+        :param int leafsize: The leafsize to use when creating the tree
+        """
+        from colocate.haversinedistancekdtreeindex import HaversineDistanceKDTreeIndex
+        self.haversine_distance_kd_tree_index = HaversineDistanceKDTreeIndex(data, leafsize)
+
 
 def index_iterator_nditer(points, include_masked=True):
     """Iterates over the indexes of a multi-dimensional array of a specified shape.

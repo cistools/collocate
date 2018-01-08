@@ -20,22 +20,14 @@ def create_index(data, leafsize=10):
 class HaversineDistanceKDTreeIndex(object):
     """k-D tree index that can be used to query using distance along the Earth's surface.
     """
-    def __init__(self):
-        self.index = None
-
-    def index_data(self, points, data, coord_map, leafsize=10):
+    def __init__(self, data, leafsize=10):
         """
         Creates the k-D tree index.
 
-        :param points: (not used) sample points
         :param data: list of HyperPoints to index
-        :param coord_map: (not used) list of tuples relating index in HyperPoint
-                          to index in sample point coords and in coords to be output
+        :param leafsize: The leafsize to use when creating the tree
         """
-        try:
-            self.index = create_index(data, leafsize=leafsize)
-        except KeyError:
-            pass # Unable to create index
+        self.index = create_index(data, leafsize=leafsize)
 
     def find_nearest_point(self, point):
         """Finds the indexed point nearest to a specified point.

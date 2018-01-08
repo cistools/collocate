@@ -1,27 +1,7 @@
 """
     Top level collocation objects
 """
-import six
 from functools import wraps
-
-
-def get_kernel(kernel):
-    """
-     Return a valid kernel instance from either an instance or a string, default is moments if no kernel is specified
-
-    :param str or colocate.col_framework.Kernel kernel:
-    :param default:
-    :return colocate.col_framework.Kernel:
-    """
-    from colocate.col_framework import get_kernel, Kernel
-    from colocate.kernels import moments
-    if not kernel:
-        kernel = moments()
-    elif isinstance(kernel, six.string_types):
-        kernel = get_kernel(kernel)()
-    elif not isinstance(kernel, Kernel):
-        raise ValueError("Invalid kernel argument, it must be either a string or a Kernel instance")
-    return kernel
 
 
 def cube_unify_col_wrapper(xr_func):

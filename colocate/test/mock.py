@@ -25,8 +25,8 @@ def make_dummy_time_series(len=10):
 
 def make_dummy_sample_points(**kwargs):
     # Find the length of the first array
-    n_values = len(list(kwargs.items())[0])
-    ds = xr.DataArray(np.empty((n_values,)), coords=kwargs)
+    n_values = len(list(kwargs.values())[0])
+    ds = xr.DataArray(np.empty((n_values,)), dims=['obs'], coords={k: (['obs'], v) for k, v in kwargs.items()})
     return ds
 
 
@@ -75,7 +75,8 @@ def make_regular_2d_ungridded_data(lat_dim_length=5, lat_min=-10, lat_max=10, lo
         data = np.ma.asarray(data)
         data.mask = mask
 
-    return xr.DataArray(data, coords={'longitude': (['x', 'y'], x), 'latitude': (['x', 'y'], y)})
+    return xr.DataArray(data, coords={'longitude': (['x', 'y'], x), 'latitude': (['x', 'y'], y)},
+                        dims=['x', 'y'])
 
 
 def make_regular_2d_ungridded_data_with_missing_values(**kwargs):
@@ -138,11 +139,13 @@ def make_regular_2d_with_time_ungridded_data():
     y_points = np.arange(-5, 6, 5)
     y, x = np.meshgrid(y_points, x_points)
 
-    times = np.reshape(pd.date_range('1984-08-27', periods=15), (5, 3))
+    times = np.reshape(np.asarray(pd.date_range('1984-08-27', periods=15)), (5, 3))
 
     data = np.reshape(np.arange(15) + 1.0, (5, 3))
 
-    return xr.DataArray(data, coords={'longitude': (['x', 'y'], x), 'latitude': (['x', 'y'], y), 'time': times})
+    return xr.DataArray(data, coords={'longitude': (['x', 'y'], x), 'latitude': (['x', 'y'], y),
+                                      'time': (['x', 'y'], times)},
+                        dims=['x', 'y'])
 
 
 def make_regular_4d_ungridded_data():
@@ -162,40 +165,22 @@ def make_regular_4d_ungridded_data():
          [ 46.  47.  48.  49.  50.]]
 
         latitude:
-        [[-10.  -5.   0.   5.  10.]
-         [-10.  -5.   0.   5.  10.]
-         [-10.  -5.   0.   5.  10.]
-         [-10.  -5.   0.   5.  10.]
-         [-10.  -5.   0.   5.  10.]
-         [-10.  -5.   0.   5.  10.]
-         [-10.  -5.   0.   5.  10.]
-         [-10.  -5.   0.   5.  10.]
-         [-10.  -5.   0.   5.  10.]
-         [-10.  -5.   0.   5.  10.]]
+        [-10.  -5.   0.   5.  10.]
 
         longitude:
-        [[-5.  -2.5  0.   2.5  5. ]
-         [-5.  -2.5  0.   2.5  5. ]
-         [-5.  -2.5  0.   2.5  5. ]
-         [-5.  -2.5  0.   2.5  5. ]
-         [-5.  -2.5  0.   2.5  5. ]
-         [-5.  -2.5  0.   2.5  5. ]
-         [-5.  -2.5  0.   2.5  5. ]
-         [-5.  -2.5  0.   2.5  5. ]
-         [-5.  -2.5  0.   2.5  5. ]
-         [-5.  -2.5  0.   2.5  5. ]]
+        [-5.  -2.5  0.   2.5  5. ]
 
         altitude:
-        [[  0.   0.   0.   0.   0.]
-         [ 10.  10.  10.  10.  10.]
-         [ 20.  20.  20.  20.  20.]
-         [ 30.  30.  30.  30.  30.]
-         [ 40.  40.  40.  40.  40.]
-         [ 50.  50.  50.  50.  50.]
-         [ 60.  60.  60.  60.  60.]
-         [ 70.  70.  70.  70.  70.]
-         [ 80.  80.  80.  80.  80.]
-         [ 90.  90.  90.  90.  90.]]
+        [[  0. ]
+         [ 10. ]
+         [ 20. ]
+         [ 30. ]
+         [ 40. ]
+         [ 50. ]
+         [ 60. ]
+         [ 70. ]
+         [ 80. ]
+         [ 90. ]]
 
         pressure:
         [[  4.   4.   4.   4.   4.]
@@ -210,33 +195,21 @@ def make_regular_4d_ungridded_data():
          [ 90.  90.  90.  90.  90.]]
 
         time:
-        [[1984-08-27 1984-08-28 1984-08-29 1984-08-30 1984-08-31]
-         [1984-08-27 1984-08-28 1984-08-29 1984-08-30 1984-08-31]
-         [1984-08-27 1984-08-28 1984-08-29 1984-08-30 1984-08-31]
-         [1984-08-27 1984-08-28 1984-08-29 1984-08-30 1984-08-31]
-         [1984-08-27 1984-08-28 1984-08-29 1984-08-30 1984-08-31]
-         [1984-08-27 1984-08-28 1984-08-29 1984-08-30 1984-08-31]
-         [1984-08-27 1984-08-28 1984-08-29 1984-08-30 1984-08-31]
-         [1984-08-27 1984-08-28 1984-08-29 1984-08-30 1984-08-31]
-         [1984-08-27 1984-08-28 1984-08-29 1984-08-30 1984-08-31]
-         [1984-08-27 1984-08-28 1984-08-29 1984-08-30 1984-08-31]]
+        [1984-08-27 1984-08-28 1984-08-29 1984-08-30 1984-08-31]
 
         They are shaped to represent a typical lidar type satelite data set.
     """
 
     x_points = np.linspace(-10, 10, 5)
     y_points = np.linspace(-5, 5, 5)
-    times = pd.date_range('1984-08-27', periods=15)
+    times = pd.date_range('1984-08-27', periods=5)
 
     alt = np.linspace(0, 90, 10)
     data = np.reshape(np.arange(50) + 1.0, (10, 5))
 
-    y, a = np.meshgrid(y_points, alt)
-    x, a = np.meshgrid(x_points, alt)
-    t, a = np.meshgrid(times, alt)
-    p = a
-    p[0, :] = 4
-    p[1, :] = 16
+    _, pres = np.meshgrid(times, alt)
+    pres[0, :] = 4
+    pres[1, :] = 16
 
     # a = AuxCoord(a, standard_name='altitude', units='meters')
     # x = AuxCoord(x, standard_name='latitude', units='degrees')
@@ -248,8 +221,9 @@ def make_regular_4d_ungridded_data():
     #             units="kg m-2 s-1", dim_coords_and_dims=[(DimCoord(range(10), var_name="z"), 0),
     #                                                      (DimCoord(range(5), var_name="t"), 1)],
     #             aux_coords_and_dims=[(x, (0, 1)), (y, (0, 1)), (t, (0, 1)), (a, (0, 1)), (p, (0, 1))])
-    return xr.DataArray(data, coords={'altitude': (['z', 't'], a),
-                                      'latitude': (['z', 't'], x),
-                                      'longitude': (['z', 't'], y),
-                                      'air_pressure': (['z', 't'], p),
-                                      'time': (['z', 't'], times)})
+    return xr.DataArray(data, coords={'altitude': (['z'], alt),
+                                      'latitude': (['t'], x_points),
+                                      'longitude': (['t'], y_points),
+                                      'air_pressure': (['z', 't'], pres),
+                                      'time': (['t'], times)},
+                        dims=['z', 't'])
