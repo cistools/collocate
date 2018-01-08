@@ -46,7 +46,7 @@ def collocate(sample, data, kernel=None, index=None, fill_value=None, missing_da
 
     sample_points_count = len(sample)
     # Create an empty masked array to store the collocated values. The elements will be unmasked by assignment.
-    values = np.ma.masked_all((len(var_set_details), sample_points_count))
+    values = np.ma.masked_all((sample_points_count, len(var_set_details)))
     values.fill_value = fill_value
 
     logging.info("    {} sample points".format(sample_points_count))
@@ -54,14 +54,14 @@ def collocate(sample, data, kernel=None, index=None, fill_value=None, missing_da
 
     # If we just want the nearest point in lat/lon we can shortcut the collocation
     if isinstance(kernel, nn_horizontal_kdtree):
-        values[0, :] = kernel.get_value(sample, data)
+        values[:, 0] = kernel.get_value(sample, data)
     else:
         for i, point, con_points in index.get_iterator(missing_data_for_missing_sample, data, sample):
-            values[:, i] = kernel.get_value(point, con_points)
+            values[i, :] = kernel.get_value(point, con_points)
 
     return_data = Dataset()
     for idx, var_details in enumerate(var_set_details):
-        new = DataArray(values[idx, :], coords=sample.coords,
+        new = DataArray(values[:, idx], coords=sample.coords,
                         attrs=dict(long_name=var_details[1], units=var_details[3]))
         return_data[var_details[0]] = new
 

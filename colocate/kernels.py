@@ -202,7 +202,10 @@ class nn_horizontal(Kernel):
             # No points to check
             raise ValueError
         for idx, data_point in iterator:
-            if (haversine(point, nearest_point) > haversine(point, data_point)):
+            if (haversine(np.asarray([point.longitude.item(), point.latitude.item()]),
+                          nearest_point[['longitude', 'latitude']].values) >
+                    haversine(np.asarray([point.longitude.item(), point.latitude.item()]),
+                              data_point[['longitude', 'latitude']].values)):
                 nearest_point = data_point
         return nearest_point.vals
 

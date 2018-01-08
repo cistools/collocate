@@ -22,9 +22,9 @@ class TestFullAverage(unittest.TestCase):
                                                       time=[dt.datetime(1984, 8, 29, 8, 34)])
 
         new_data = collocate(sample_points, ug_data, moments())
-        means = new_data[0]
-        std_dev = new_data[1]
-        no_points = new_data[2]
+        means = new_data['var']
+        std_dev = new_data['var_std_dev']
+        no_points = new_data['var_num_points']
 
         eq_(means.data[0], 25.5)
         assert_almost_equal(std_dev.data[0], np.sqrt(212.5))
@@ -41,9 +41,9 @@ class TestFullAverage(unittest.TestCase):
                                                       time=[dt.datetime(1984, 8, 29, 8, 34)])
 
         new_data = collocate(sample_points, ug_data, moments())
-        means = new_data[0]
-        std_dev = new_data[1]
-        no_points = new_data[2]
+        means = new_data['var']
+        std_dev = new_data['var_std_dev']
+        no_points = new_data['var_num_points']
 
         eq_(means.data[0], 25.5)
         assert_almost_equal(std_dev.data[0], np.sqrt(212.5))
@@ -58,9 +58,9 @@ class TestNNHorizontal(unittest.TestCase):
         ug_data = mock.make_regular_2d_ungridded_data()
         sample_points = mock.make_dummy_sample_points(latitude=[1.0, 4.0, -4.0], longitude=[1.0, 4.0, -4.0])
         new_data = collocate(sample_points, ug_data, nn_horizontal())['var']
-        eq_(new_data.data[0], 8.0)
-        eq_(new_data.data[1], 12.0)
-        eq_(new_data.data[2], 4.0)
+        eq_(new_data.data['var'], 8.0)
+        eq_(new_data.data['var_std_dev'], 12.0)
+        eq_(new_data.data['var_num_points'], 4.0)
 
     def test_already_collocated_in_col_ungridded_to_ungridded_in_2d(self):
         from colocate.kernels import nn_horizontal

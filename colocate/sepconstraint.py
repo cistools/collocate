@@ -86,7 +86,8 @@ class SepConstraint:
         for i in iterator:
             p = points[i]
             if indices:
-                # Note that data_points has to be a dataframe at this point because of the indexing
+                # dimension = data_points.coords['longitude'].dims[0]
+                # d_points = data_points.sel(**{dimension: indices[i]})
                 d_points = data_points[indices[i]]
             else:
                 d_points = data_points
@@ -107,7 +108,7 @@ class SepConstraint:
         from colocate.utils import get_lat_lon_names
 
         # lat_lon_points = data.to_dataframe(data.name or 'unknown').loc[:, get_lat_lon_names(data)]
-        lat_lon_points =  np.column_stack((data.latitude.values.ravel(),
+        lat_lon_points = np.column_stack((data.latitude.values.ravel(),
                                            data.longitude.values.ravel()))
         self.haversine_distance_kd_tree_index = HaversineDistanceKDTreeIndex(lat_lon_points, leafsize)
 

@@ -39,4 +39,7 @@ class HaversineDistanceKDTreeIndex(object):
         For each element ``self.data[i]`` of this tree, ``results[i]`` is a
             list of the indices of its neighbors in ``other.data``.
         """
-        return HaversineDistanceKDTree(sample).query_ball_tree(self.index, distance)
+        import numpy as np
+        points = np.column_stack((sample.latitude.values.ravel(),
+                                  sample.longitude.values.ravel()))
+        return HaversineDistanceKDTree(points).query_ball_tree(self.index, distance)
