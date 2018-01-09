@@ -3,20 +3,10 @@ collocate
 
 [![Build Status](https://travis-ci.org/cistools/collocate.svg?branch=master)](https://travis-ci.org/cistools/collocate)
 
-collocate un-structured xarray DataArray's (or Iris Cube's) in arbitrary physical dimensions:
+collocate un-structured xarray DataArray's (or Iris Cube's) in arbitrary physical dimensions.
 
-    >>> import numpy as np
-    >>> import xarray as xr
-    >>> from collocate import collocate
+For example, taking a dataset with mutli-dimensional latitude and longitude coordinates
 
-    # Create an 'ungridded' DataArray
-    >>> x_points = np.linspace(-10, 10, 5)
-    >>> y_points = np.linspace(-5, 5, 3)
-    >>> y, x = np.meshgrid(y_points, x_points)
-
-    >>> da = xr.DataArray(np.reshape(np.arange(15), (5, 3)),
-                          coords={'longitude': (['x', 'y'], x), 'latitude': (['x', 'y'], y)},
-                          dims=['x', 'y'])
     >>> da
      <xarray.DataArray (x: 5, y: 3)>
     array([[ 0,  1,  2],
@@ -29,10 +19,8 @@ collocate un-structured xarray DataArray's (or Iris Cube's) in arbitrary physica
         latitude   (x, y) float64 -5.0 0.0 5.0 -5.0 0.0 5.0 -5.0 0.0 5.0 -5.0 ...
     Dimensions without coordinates: x, y
 
-    # Create some points to sample at
-    >>> points = xr.DataArray(np.zeros(3), dims=['obs'], 
-                              coords={'latitude': (['obs'], [0.5, 5.4, 12]),
-                              'longitude': (['obs'], [-0.7, 0.2, 3])})
+And a set of arbitrary points
+
     >> points
     <xarray.DataArray (obs: 3)>
     array([ 0.,  0.,  0.])
@@ -41,8 +29,8 @@ collocate un-structured xarray DataArray's (or Iris Cube's) in arbitrary physica
         longitude  (obs) float64 -0.7 0.2 3.0
     Dimensions without coordinates: obs
 
-    
-    # Do the collocation to find the mean value of the data with 500km of each sample point
+We can perform a collocation to find the mean value of the data with 500km of each sample point like so
+
     >>> collocate(points, da, h_sep=500)
      
     <xarray.Dataset>
@@ -55,7 +43,7 @@ collocate un-structured xarray DataArray's (or Iris Cube's) in arbitrary physica
         var        (obs) float64 5.5 8.0 nan
     
 
-**Warning** this is still a prototype and the API is likely to change!
+**Note** this is still a prototype and the API is likely to change!
 
 Contact
 -------
