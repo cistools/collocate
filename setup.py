@@ -15,8 +15,7 @@ if on_rtd:
     test_dependencies = []
 
 else:
-    dependencies = ["xarray",
-                    "scipy>=0.15.0"]
+    dependencies = ["xarray"]
     optional_dependencies = ['iris']
     test_dependencies = []
 
