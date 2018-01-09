@@ -84,9 +84,9 @@ class TestNNHorizontal(unittest.TestCase):
         ug_data = mock.make_regular_2d_ungridded_data()
         sample_points = mock.make_dummy_sample_points(latitude=[2.5, -2.5, 2.5, -2.5], longitude=[2.5, 2.5, -2.5, -2.5])
         new_data = collocate(sample_points, ug_data, nn_horizontal())['var']
-        assert_almost_equal(new_data.data[0], 11.0)
-        assert_almost_equal(new_data.data[1], 5.0)
-        assert_almost_equal(new_data.data[2], 10.0)
+        assert_almost_equal(new_data.data[0], 9.0)
+        assert_almost_equal(new_data.data[1], 6.0)
+        assert_almost_equal(new_data.data[2], 7.0)
         assert_almost_equal(new_data.data[3], 4.0)
 
     def test_coordinates_outside_grid_in_col_ungridded_to_ungridded_in_2d(self):
