@@ -1,7 +1,7 @@
 import logging
 from xarray import Dataset
 from collocate.sepconstraint import SepConstraint
-from collocate.kernels import nn_horizontal_kdtree
+from collocate.kernels import nn_horizontal_kdtree, mean
 
 __version__ = '0.1.0'
 
@@ -18,7 +18,9 @@ def collocate(sample, data, kernel=None, constraint=None, missing_data_for_missi
     :return xr.Dataset: With the same coordinates as the sample and one DataArray for each Kernel return value
     """
     constraint = constraint or SepConstraint(**kwargs)
+
     # We can have any kernel, default to moments
+    kernel = kernel or mean()
 
     if isinstance(data, Dataset):
         # Indexing (for SepConstraint) will only take place on the first iteration,

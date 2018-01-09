@@ -24,13 +24,12 @@ class Kernel(object):
         that each implementation will only work with a specific type of data (gridded, ungridded etc.) Note that this
         method will be called for every sample point and so could become a bottleneck for calculations, it is advisable
         to make it as quick as is practical. If this method is unable to provide a value (for example if no data points
-        were given) a ValueError should be thrown.
+        were given) a NaN value is returned.
 
         :param point: A single HyperPoint
         :param data: A set of data points to reduce to a single value
         :return: For return_size=1 a single value (number) otherwise a list of return values, which represents some
             operation on the points provided
-        :raises ValueError: When the method is unable to return a value
         """
 
     def get_variable_details(self, var_name, var_long_name, var_standard_name, var_units):
@@ -64,8 +63,6 @@ class AbstractDataOnlyKernel(Kernel):
             operation on the points provided
         """
         values = data.vals
-        if len(values) == 0:
-            raise ValueError
         return self.get_value_for_data_only(values)
 
 
@@ -77,12 +74,11 @@ class AbstractDataOnlyKernel(Kernel):
 
         Note that this method will be called for every sample point in which data can be placed and so could become a
         bottleneck for calculations, it is advisable to make it as quick as is practical. If this method is unable to
-        provide a value (for example if no data points were given) a ValueError should be thrown. This method will not
+        provide a value (for example if no data points were given) a NaN value is returned. This method will not
         be called if there are no values to be used for calculations.
 
         :param values: A numpy array of values (can not be none or empty)
         :return: A single data item if return_size is 1 or a list of items containing :attr:`.Kernel.return_size` items
-        :raises ValueError: If there are any problems creating a value
         """
 
 
@@ -196,11 +192,7 @@ class nn_horizontal(Kernel):
         from collocate.kdtree import haversine
         iterator = data.iterrows()
 
-        try:
-            nearest_point = next(iterator)[1]
-        except StopIteration:
-            # No points to check
-            raise ValueError
+        nearest_point = next(iterator)[1]
         for idx, data_point in iterator:
             if (haversine(np.asarray([point.longitude.item(), point.latitude.item()]),
                           nearest_point[['latitude', 'longitude']].values) >
@@ -254,11 +246,7 @@ class nn_pressure(Kernel):
 
         iterator = data.iterrows()
 
-        try:
-            nearest_point = next(iterator)[1]
-        except StopIteration:
-            # No points to check
-            raise ValueError
+        nearest_point = next(iterator)[1]
         for idx, data_point in iterator:
             if pres_sep(point, nearest_point) > pres_sep(point, data_point):
                 nearest_point = data_point
