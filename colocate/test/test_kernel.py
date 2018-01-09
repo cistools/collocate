@@ -2,11 +2,8 @@
 Tests the various kernels
 """
 import unittest
-
-from nose.tools import eq_
 from numpy.testing import assert_almost_equal
 import numpy as np
-
 from colocate.test import mock
 
 
@@ -26,9 +23,9 @@ class TestFullAverage(unittest.TestCase):
         std_dev = new_data['var_std_dev']
         no_points = new_data['var_num_points']
 
-        eq_(means.data[0], 25.5)
+        assert_almost_equal(means.data[0], 25.5)
         assert_almost_equal(std_dev.data[0], np.sqrt(212.5))
-        eq_(no_points.data[0], 50)
+        assert_almost_equal(no_points.data[0], 50)
 
     def test_basic_col_in_4d_with_pressure_not_altitude(self):
         from colocate.kernels import moments
@@ -45,9 +42,9 @@ class TestFullAverage(unittest.TestCase):
         std_dev = new_data['var_std_dev']
         no_points = new_data['var_num_points']
 
-        eq_(means.data[0], 25.5)
+        assert_almost_equal(means.data[0], 25.5)
         assert_almost_equal(std_dev.data[0], np.sqrt(212.5))
-        eq_(no_points.data[0], 50)
+        assert_almost_equal(no_points.data[0], 50)
 
 
 class TestNNHorizontal(unittest.TestCase):
@@ -58,9 +55,9 @@ class TestNNHorizontal(unittest.TestCase):
         ug_data = mock.make_regular_2d_ungridded_data()
         sample_points = mock.make_dummy_sample_points(latitude=[1.0, 4.0, -4.0], longitude=[1.0, 4.0, -4.0])
         new_data = collocate(sample_points, ug_data, nn_horizontal())['var']
-        eq_(new_data.data[0], 8.0)
-        eq_(new_data.data[1], 12.0)
-        eq_(new_data.data[2], 4.0)
+        assert_almost_equal(new_data.data[0], 8.0)
+        assert_almost_equal(new_data.data[1], 12.0)
+        assert_almost_equal(new_data.data[2], 4.0)
 
     def test_already_collocated_in_col_ungridded_to_ungridded_in_2d(self):
         from colocate.kernels import nn_horizontal
@@ -70,7 +67,7 @@ class TestNNHorizontal(unittest.TestCase):
         # This point already exists on the cube with value 5 - which shouldn't be a problem
         sample_points = mock.make_dummy_sample_points(latitude=[0.0], longitude=[0.0])
         new_data = collocate(sample_points, ug_data, nn_horizontal())['var']
-        eq_(new_data.data[0], 8.0)
+        assert_almost_equal(new_data.data[0], 8.0)
 
     def test_coordinates_exactly_between_points_in_col_ungridded_to_ungridded_in_2d(self):
         """
@@ -87,10 +84,10 @@ class TestNNHorizontal(unittest.TestCase):
         ug_data = mock.make_regular_2d_ungridded_data()
         sample_points = mock.make_dummy_sample_points(latitude=[2.5, -2.5, 2.5, -2.5], longitude=[2.5, 2.5, -2.5, -2.5])
         new_data = collocate(sample_points, ug_data, nn_horizontal())['var']
-        eq_(new_data.data[0], 11.0)
-        eq_(new_data.data[1], 5.0)
-        eq_(new_data.data[2], 10.0)
-        eq_(new_data.data[3], 4.0)
+        assert_almost_equal(new_data.data[0], 11.0)
+        assert_almost_equal(new_data.data[1], 5.0)
+        assert_almost_equal(new_data.data[2], 10.0)
+        assert_almost_equal(new_data.data[3], 4.0)
 
     def test_coordinates_outside_grid_in_col_ungridded_to_ungridded_in_2d(self):
         from colocate.kernels import nn_horizontal
@@ -99,10 +96,10 @@ class TestNNHorizontal(unittest.TestCase):
         ug_data = mock.make_regular_2d_ungridded_data()
         sample_points = mock.make_dummy_sample_points(latitude=[5.5, -5.5, 5.5, -5.5], longitude=[5.5, 5.5, -5.5, -5.5])
         new_data = collocate(sample_points, ug_data, nn_horizontal())['var']
-        eq_(new_data.data[0], 12.0)
-        eq_(new_data.data[1], 6.0)
-        eq_(new_data.data[2], 10.0)
-        eq_(new_data.data[3], 4.0)
+        assert_almost_equal(new_data.data[0], 12.0)
+        assert_almost_equal(new_data.data[1], 6.0)
+        assert_almost_equal(new_data.data[2], 10.0)
+        assert_almost_equal(new_data.data[3], 4.0)
 
 
 class TestNNTime(unittest.TestCase):
@@ -129,9 +126,9 @@ class TestNNTime(unittest.TestCase):
                                                                       dtype='M8[ns]'))
 
         new_data = collocate(sample_points, ug_data, nn_time())['var']
-        eq_(new_data.data[0], 3.0)
-        eq_(new_data.data[1], 7.0)
-        eq_(new_data.data[2], 10.0)
+        assert_almost_equal(new_data.data[0], 3.0)
+        assert_almost_equal(new_data.data[1], 7.0)
+        assert_almost_equal(new_data.data[2], 10.0)
 
     def test_basic_col_with_time(self):
         from colocate.kernels import nn_time
@@ -180,7 +177,7 @@ class TestNNTime(unittest.TestCase):
         # Choose a time at midday
         sample_points = mock.make_dummy_sample_points(latitude=[0.0], longitude=[0.0], time=[dt.datetime(1984, 8, 29, 12)])
         new_data = collocate(sample_points, ug_data, nn_time())['var']
-        eq_(new_data.data[0], 3.0)
+        assert_almost_equal(new_data.data[0], 3.0)
 
     def test_coordinates_outside_grid_in_col_ungridded_to_ungridded_in_2d(self):
         from colocate.kernels import nn_time
@@ -193,9 +190,9 @@ class TestNNTime(unittest.TestCase):
                                                             dt.datetime(1984, 8, 26),
                                                             dt.datetime(1984, 8, 27)])
         new_data = collocate(sample_points, ug_data, nn_time())['var']
-        eq_(new_data.data[0], 1.0)
-        eq_(new_data.data[1], 1.0)
-        eq_(new_data.data[2], 15.0)
+        assert_almost_equal(new_data.data[0], 1.0)
+        assert_almost_equal(new_data.data[1], 1.0)
+        assert_almost_equal(new_data.data[2], 15.0)
 
 
 class TestNNAltitude(unittest.TestCase):
@@ -221,9 +218,9 @@ class TestNNAltitude(unittest.TestCase):
                                                             dt.datetime(1984, 9, 2, 1, 23),
                                                             dt.datetime(1984, 9, 4, 15, 54)])
         new_data = collocate(sample_points, ug_data, nn_altitude())['var']
-        eq_(new_data.data[0], 6.0)
-        eq_(new_data.data[1], 16.0)
-        eq_(new_data.data[2], 46.0)
+        assert_almost_equal(new_data.data[0], 6.0)
+        assert_almost_equal(new_data.data[1], 16.0)
+        assert_almost_equal(new_data.data[2], 46.0)
 
     def test_already_collocated_in_col_ungridded_to_ungridded_in_2d(self):
         from colocate.kernels import nn_altitude
@@ -234,7 +231,7 @@ class TestNNAltitude(unittest.TestCase):
         sample_points = mock.make_dummy_sample_points(latitude=[0.0], longitude=[0.0], altitude=[80.0],
                                                       time=[dt.datetime(1984, 9, 4, 15, 54)])
         new_data = collocate(sample_points, ug_data, nn_altitude())['var']
-        eq_(new_data.data[0], 41.0)
+        assert_almost_equal(new_data.data[0], 41.0)
 
     def test_coordinates_exactly_between_points_in_col_ungridded_to_ungridded_in_2d(self):
         """
@@ -253,7 +250,7 @@ class TestNNAltitude(unittest.TestCase):
                                                       time=[dt.datetime(1984, 8, 29, 12)])
 
         new_data = collocate(sample_points, ug_data, nn_altitude())['var']
-        eq_(new_data.data[0], 16.0)
+        assert_almost_equal(new_data.data[0], 16.0)
 
     def test_coordinates_outside_grid_in_col_ungridded_to_ungridded_in_2d(self):
         from colocate.kernels import nn_altitude
@@ -269,9 +266,9 @@ class TestNNAltitude(unittest.TestCase):
 
 
         new_data = collocate(sample_points, ug_data, nn_altitude())['var']
-        eq_(new_data.data[0], 1.0)
-        eq_(new_data.data[1], 46.0)
-        eq_(new_data.data[2], 46.0)
+        assert_almost_equal(new_data.data[0], 1.0)
+        assert_almost_equal(new_data.data[1], 46.0)
+        assert_almost_equal(new_data.data[2], 46.0)
 
 
 class TestNNPressure(unittest.TestCase):
@@ -299,9 +296,9 @@ class TestNNPressure(unittest.TestCase):
                                                             dt.datetime(1984, 9, 4, 15, 54)])
 
         new_data = collocate(sample_points, ug_data, nn_pressure())['var']
-        eq_(new_data.data[0], 6.0)
-        eq_(new_data.data[1], 16.0)
-        eq_(new_data.data[2], 46.0)
+        assert_almost_equal(new_data.data[0], 6.0)
+        assert_almost_equal(new_data.data[1], 16.0)
+        assert_almost_equal(new_data.data[2], 46.0)
 
     def test_already_collocated_in_col_ungridded_to_ungridded_in_2d(self):
         from colocate.kernels import nn_pressure
@@ -313,7 +310,7 @@ class TestNNPressure(unittest.TestCase):
                                                       time=[dt.datetime(1984, 9, 4, 15, 54)])
 
         new_data = collocate(sample_points, ug_data, nn_pressure())['var']
-        eq_(new_data.data[0], 41.0)
+        assert_almost_equal(new_data.data[0], 41.0)
 
     def test_coordinates_exactly_between_points_in_col_ungridded_to_ungridded_in_2d(self):
         """
@@ -332,7 +329,7 @@ class TestNNPressure(unittest.TestCase):
                                                       time=[dt.datetime(1984, 8, 29, 12)])
 
         new_data = collocate(sample_points, ug_data, nn_pressure())['var']
-        eq_(new_data.data[0], 1.0)
+        assert_almost_equal(new_data.data[0], 1.0)
 
     def test_coordinates_outside_grid_in_col_ungridded_to_ungridded_in_2d(self):
         from colocate.kernels import nn_pressure
@@ -347,9 +344,9 @@ class TestNNPressure(unittest.TestCase):
                                                             dt.datetime(1984, 9, 4, 15, 54)])
 
         new_data = collocate(sample_points, ug_data, nn_pressure())['var']
-        eq_(new_data.data[0], 1.0)
-        eq_(new_data.data[1], 46.0)
-        eq_(new_data.data[2], 46.0)
+        assert_almost_equal(new_data.data[0], 1.0)
+        assert_almost_equal(new_data.data[1], 46.0)
+        assert_almost_equal(new_data.data[2], 46.0)
 
 
 class TestMean(unittest.TestCase):
@@ -365,7 +362,7 @@ class TestMean(unittest.TestCase):
 
 
         new_data = collocate(sample_points, ug_data, mean())['var']
-        eq_(new_data.data[0], 25.5)
+        assert_almost_equal(new_data.data[0], 25.5)
 
 
 if __name__ == '__main__':

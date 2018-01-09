@@ -3,10 +3,8 @@
 """
 import unittest
 import datetime as dt
-
 import numpy as np
 import xarray as xr
-
 from colocate.kernels import moments
 from colocate import collocate
 from colocate.test import mock

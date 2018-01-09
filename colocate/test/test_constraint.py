@@ -2,9 +2,8 @@
 Test the constraints
 """
 import unittest
-
-from nose.tools import eq_
 from colocate.test import mock
+from numpy.testing import assert_equal
 
 
 class TestSepConstraint(unittest.TestCase):
@@ -40,9 +39,9 @@ class TestSepConstraint(unittest.TestCase):
         ref_vals = np.array([27., 28., 29., 32., 33., 34.])
 
         new_points = constraint.constrain_points(sample_point, ug_data)
+        new_vals = new_points.vals
 
-        eq_(ref_vals.size, new_points.size)
-        assert (np.equal(ref_vals, new_points).all())
+        assert_equal(ref_vals, new_vals)
 
     def test_alt_constraint_in_4d(self):
         from colocate.sepconstraint import SepConstraint
@@ -65,9 +64,9 @@ class TestSepConstraint(unittest.TestCase):
                              [31., 32., 33., 34., 35.]])
 
         new_points = constraint.constrain_points(sample_point, ug_data)
+        new_vals = new_points.vals
 
-        eq_(ref_vals.size, new_points.size)
-        assert (np.equal(ref_vals, new_points).all())
+        assert_equal(ref_vals, new_vals)
 
     def test_horizontal_constraint_in_4d(self):
         from colocate.sepconstraint import SepConstraint
@@ -90,9 +89,9 @@ class TestSepConstraint(unittest.TestCase):
         ref_vals = np.reshape(np.arange(50) + 1.0, (10, 5))[:, 1:4]
 
         new_points = constraint.constrain_points(sample_point, ug_data)
+        new_vals = new_points.vals
 
-        eq_(ref_vals.size, new_points.size)
-        assert (np.equal(ref_vals, new_points).all())
+        assert_equal(ref_vals, new_vals)
 
     def test_time_constraint_in_4d(self):
         from colocate.sepconstraint import SepConstraint
@@ -110,9 +109,9 @@ class TestSepConstraint(unittest.TestCase):
         ref_vals = np.reshape(np.arange(50) + 1.0, (10, 5))[:, 1:4]
 
         new_points = constraint.constrain_points(sample_point, ug_data)
+        new_vals = new_points.vals
 
-        eq_(ref_vals.size, new_points.size)
-        assert (np.equal(ref_vals, new_points).all())
+        assert_equal(ref_vals, new_vals)
 
     def test_pressure_constraint_in_4d(self):
         from colocate.sepconstraint import SepConstraint
@@ -133,9 +132,9 @@ class TestSepConstraint(unittest.TestCase):
                              [21., 22., 23., 24., 25.]])
 
         new_points = constraint.constrain_points(sample_point, ug_data)
+        new_vals = new_points.vals
 
-        eq_(ref_vals.size, new_points.size)
-        assert (np.equal(ref_vals, new_points).all())
+        assert_equal(ref_vals, new_vals)
 
 
 if __name__ == '__main__':

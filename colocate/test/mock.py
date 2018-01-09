@@ -1,10 +1,8 @@
 """
 Module for creating mock, dummies and fakes
 """
-from nose.tools import raises
 import numpy as np
 import pandas as pd
-import numpy.ma as ma
 import xarray as xr
 
 

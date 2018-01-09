@@ -1,8 +1,5 @@
 import logging
-
-import numpy as np
-from xarray import Dataset, DataArray
-
+from xarray import Dataset
 from colocate.sepconstraint import SepConstraint
 from colocate.kernels import nn_horizontal_kdtree
 
