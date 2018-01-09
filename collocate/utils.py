@@ -2,7 +2,7 @@
 Iris wrapper and associated utilities
 """
 from functools import wraps
-from colocate import collocate
+from collocate import collocate
 
 
 def cube_wrapper(xr_func):
@@ -45,7 +45,7 @@ def cube_wrapper(xr_func):
     return cube_func
 
 
-iris_colocate = cube_wrapper(collocate)
+iris_collocate = cube_wrapper(collocate)
 
 
 def _fix_longitude_range(data_points, range_start):

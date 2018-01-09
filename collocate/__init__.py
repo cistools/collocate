@@ -1,42 +1,38 @@
 import logging
 from xarray import Dataset
-from colocate.sepconstraint import SepConstraint
-from colocate.kernels import nn_horizontal_kdtree
+from collocate.sepconstraint import SepConstraint
+from collocate.kernels import nn_horizontal_kdtree
 
-__version__ = '0.0.1'
+__version__ = '0.1.0'
 
 
-def collocate(sample, data, kernel=None, index=None, missing_data_for_missing_sample=True, **kwargs):
+def collocate(sample, data, kernel=None, constraint=None, missing_data_for_missing_sample=True, **kwargs):
     """
-    This collocator takes a list of HyperPoints and a data object (currently either Ungridded
-    data or a Cube) and returns one new LazyData object with the values as determined by the
-    constraint and kernel objects. The metadata for the output LazyData object is copied from
-    the input data object.
+    Find all the data points which meet the specified criteria for each sample point and apply the kernel. The kernel
+    may return multiple DataArrays but they will all have the same (possibly flattened) shape as the sample points.
 
-    :param UngriddedData or UngriddedCoordinates points: Object defining the sample points
-    :param UngriddedData data: The source data to collocate from
-    :param constraint: An instance of a Constraint subclass which takes a data object and
-                       returns a subset of that data based on it's internal parameters
-    :param kernel: An instance of a Kernel subclass which takes a number of points and returns
-                   a single value
-    :return UngriddedData or DataList: Depending on the input
+    :param xr.DataArray points: The sample points
+    :param xr.DataArray data: The data to collocate from
+    :param Kernel kernel: An instance of a Kernel subclass which takes a number of points and returns one or more values
+    :param SepConstraint constraint: An optional, pre-constructed constraint object
+    :return xr.Dataset: With the same coordinates as the sample and one DataArray for each Kernel return value
     """
-    index = index or SepConstraint(**kwargs)
+    constraint = constraint or SepConstraint(**kwargs)
     # We can have any kernel, default to moments
 
     if isinstance(data, Dataset):
-        # Indexing (for SepConstraintKdTree) will only take place on the first iteration,
+        # Indexing (for SepConstraint) will only take place on the first iteration,
         # so we really can just call this method recursively if we've got a list of data.
         output = Dataset()
         for var in data.data_vars.values():
-            output.update(collocate(sample, var, kernel, index))
+            output.update(collocate(sample, var, kernel, constraint))
         return output
 
     # Create a flattened dataframe (with a standard name) to work with the data
     flattened_data = data.to_dataframe('vals')
     flattened_sample = sample.to_dataframe('vals')
 
-    index.index_data(flattened_data)
+    constraint.index_data(flattened_data)
 
     logging.info("--> Collocating...")
 
@@ -53,7 +49,7 @@ def collocate(sample, data, kernel=None, index=None, missing_data_for_missing_sa
     if isinstance(kernel, nn_horizontal_kdtree):
         result.loc[:, var_set_details[0][0]] = kernel.get_value(flattened_sample, flattened_data)
     else:
-        for i, point, con_points in index.get_iterator(missing_data_for_missing_sample, flattened_data, flattened_sample):
+        for i, point, con_points in constraint.get_iterator(missing_data_for_missing_sample, flattened_data, flattened_sample):
             result.loc[i, [v[0] for v in var_set_details]] = kernel.get_value(point, con_points)
 
     # Convert the dataframe back to a dataset

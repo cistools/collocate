@@ -193,7 +193,7 @@ class nn_horizontal(Kernel):
             Collocation using nearest neighbours along the face of the earth where both points and
               data are a list of HyperPoints. The default point is the first point.
         """
-        from colocate.kdtree import haversine
+        from collocate.kdtree import haversine
         iterator = data.iterrows()
 
         try:

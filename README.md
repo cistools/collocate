@@ -1,2 +1,2 @@
-# colocate
-Colocate xarray trajectories in arbitrary physical dimensions
+# collocate
+collocate xarray trajectories in arbitrary physical dimensions

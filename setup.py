@@ -2,7 +2,7 @@ import os.path
 
 from setuptools import setup, find_packages, Command
 from pkg_resources import require, DistributionNotFound, VersionConflict
-from colocate import __version__
+from collocate import __version__
 
 
 root_path = os.path.dirname(__file__)
@@ -48,9 +48,9 @@ README = open(os.path.join(root_path, 'README.md')).read()
 
 
 setup(
-    name='colocate',
+    name='collocate',
     version=__version__,
-    description='Colocate',
+    description='collocate',
     long_description=README,
     maintainer='Duncan Watson-Parris',
     maintainer_email='duncan.watson-parris@physics.ox.ac.uk',

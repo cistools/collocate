@@ -2,14 +2,14 @@
 Test the constraints
 """
 import unittest
-from colocate.test import mock
+from collocate.test import mock
 from numpy.testing import assert_equal
 
 
 class TestSepConstraint(unittest.TestCase):
 
     def test_all_constraint_in_4d(self):
-        from colocate.sepconstraint import SepConstraint
+        from collocate.sepconstraint import SepConstraint
         import datetime as dt
         import numpy as np
 
@@ -44,7 +44,7 @@ class TestSepConstraint(unittest.TestCase):
         assert_equal(ref_vals, new_vals)
 
     def test_alt_constraint_in_4d(self):
-        from colocate.sepconstraint import SepConstraint
+        from collocate.sepconstraint import SepConstraint
         import datetime as dt
         import numpy as np
 
@@ -69,7 +69,7 @@ class TestSepConstraint(unittest.TestCase):
         assert_equal(ref_vals, new_vals)
 
     def test_horizontal_constraint_in_4d(self):
-        from colocate.sepconstraint import SepConstraint
+        from collocate.sepconstraint import SepConstraint
         import datetime as dt
         import numpy as np
 
@@ -94,7 +94,7 @@ class TestSepConstraint(unittest.TestCase):
         assert_equal(ref_vals, new_vals)
 
     def test_time_constraint_in_4d(self):
-        from colocate.sepconstraint import SepConstraint
+        from collocate.sepconstraint import SepConstraint
         import datetime as dt
         import numpy as np
 
@@ -114,7 +114,7 @@ class TestSepConstraint(unittest.TestCase):
         assert_equal(ref_vals, new_vals)
 
     def test_pressure_constraint_in_4d(self):
-        from colocate.sepconstraint import SepConstraint
+        from collocate.sepconstraint import SepConstraint
         import datetime as dt
         import numpy as np
 

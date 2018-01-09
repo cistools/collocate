@@ -1,4 +1,4 @@
-from colocate.kdtree import HaversineDistanceKDTree
+from collocate.kdtree import HaversineDistanceKDTree
 
 
 class HaversineDistanceKDTreeIndex(object):

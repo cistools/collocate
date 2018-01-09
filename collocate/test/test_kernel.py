@@ -4,13 +4,13 @@ Tests the various kernels
 import unittest
 from numpy.testing import assert_almost_equal
 import numpy as np
-from colocate.test import mock
+from collocate.test import mock
 
 
 class TestFullAverage(unittest.TestCase):
     def test_basic_col_in_4d(self):
-        from colocate.kernels import moments
-        from colocate import collocate
+        from collocate.kernels import moments
+        from collocate import collocate
         import datetime as dt
 
         data = mock.make_regular_4d_ungridded_data()
@@ -28,8 +28,8 @@ class TestFullAverage(unittest.TestCase):
         assert_almost_equal(no_points.data[0], 50)
 
     def test_basic_col_in_4d_with_pressure_not_altitude(self):
-        from colocate.kernels import moments
-        from colocate import collocate
+        from collocate.kernels import moments
+        from collocate import collocate
         import datetime as dt
 
         data = mock.make_regular_4d_ungridded_data()
@@ -49,8 +49,8 @@ class TestFullAverage(unittest.TestCase):
 
 class TestNNHorizontal(unittest.TestCase):
     def test_basic_col_in_2d(self):
-        from colocate.kernels import nn_horizontal
-        from colocate import collocate
+        from collocate.kernels import nn_horizontal
+        from collocate import collocate
 
         data = mock.make_regular_2d_ungridded_data()
         sample_points = mock.make_dummy_sample_points(latitude=[1.0, 4.0, -4.0], longitude=[1.0, 4.0, -4.0])
@@ -60,8 +60,8 @@ class TestNNHorizontal(unittest.TestCase):
         assert_almost_equal(new_data.data[2], 4.0)
 
     def test_already_collocated_in_col_in_2d(self):
-        from colocate.kernels import nn_horizontal
-        from colocate import collocate
+        from collocate.kernels import nn_horizontal
+        from collocate import collocate
 
         data = mock.make_regular_2d_ungridded_data()
         # This point already exists on the cube with value 5 - which shouldn't be a problem
@@ -78,8 +78,8 @@ class TestNNHorizontal(unittest.TestCase):
                 probably down to floating points errors in the haversine calculation as these test points are pretty
                 close together. This test is only really for documenting the behaviour for equidistant points.
         """
-        from colocate.kernels import nn_horizontal
-        from colocate import collocate
+        from collocate.kernels import nn_horizontal
+        from collocate import collocate
 
         data = mock.make_regular_2d_ungridded_data()
         sample_points = mock.make_dummy_sample_points(latitude=[2.5, -2.5, 2.5, -2.5], longitude=[2.5, 2.5, -2.5, -2.5])
@@ -90,8 +90,8 @@ class TestNNHorizontal(unittest.TestCase):
         assert_almost_equal(new_data.data[3], 4.0)
 
     def test_coordinates_outside_grid_in_col_in_2d(self):
-        from colocate.kernels import nn_horizontal
-        from colocate import collocate
+        from collocate.kernels import nn_horizontal
+        from collocate import collocate
 
         data = mock.make_regular_2d_ungridded_data()
         sample_points = mock.make_dummy_sample_points(latitude=[5.5, -5.5, 5.5, -5.5], longitude=[5.5, 5.5, -5.5, -5.5])
@@ -104,8 +104,8 @@ class TestNNHorizontal(unittest.TestCase):
 
 class TestNNTime(unittest.TestCase):
     def test_basic_col_with_incompatible_points_throws_an_AttributeError(self):
-        from colocate.kernels import nn_time
-        from colocate import collocate
+        from collocate.kernels import nn_time
+        from collocate import collocate
 
         data = mock.make_regular_2d_with_time_ungridded_data()
         # Make sample points with no time dimension specified
@@ -114,8 +114,8 @@ class TestNNTime(unittest.TestCase):
             new_data = collocate(sample_points, data, nn_time())['var']
 
     def test_basic_col_in_2d_with_time(self):
-        from colocate.kernels import nn_time
-        from colocate import collocate
+        from collocate.kernels import nn_time
+        from collocate import collocate
         import datetime as dt
 
         data = mock.make_regular_2d_with_time_ungridded_data()
@@ -131,8 +131,8 @@ class TestNNTime(unittest.TestCase):
         assert_almost_equal(new_data.data[2], 10.0)
 
     def test_basic_col_with_time(self):
-        from colocate.kernels import nn_time
-        from colocate import collocate
+        from collocate.kernels import nn_time
+        from collocate import collocate
         import numpy as np
 
         data = mock.make_dummy_sample_points(data=np.arange(4.0), latitude=[0.0, 0.0, 0.0, 0.0], longitude=[0.0, 0.0, 0.0, 0.0],
@@ -148,8 +148,8 @@ class TestNNTime(unittest.TestCase):
         assert (np.equal(new_data.data, ref).all())
 
     def test_already_collocated_in_col_in_2d(self):
-        from colocate.kernels import nn_time
-        from colocate import collocate
+        from collocate.kernels import nn_time
+        from collocate import collocate
         import datetime as dt
         import numpy as np
 
@@ -169,8 +169,8 @@ class TestNNTime(unittest.TestCase):
                 points finding any points which are closer than the current closest. If two distances were exactly
                 the same the first point to be chosen.
         """
-        from colocate.kernels import nn_time
-        from colocate import collocate
+        from collocate.kernels import nn_time
+        from collocate import collocate
         import datetime as dt
 
         data = mock.make_regular_2d_with_time_ungridded_data()
@@ -180,8 +180,8 @@ class TestNNTime(unittest.TestCase):
         assert_almost_equal(new_data.data[0], 3.0)
 
     def test_coordinates_outside_grid_in_col_in_2d(self):
-        from colocate.kernels import nn_time
-        from colocate import collocate
+        from collocate.kernels import nn_time
+        from collocate import collocate
         import datetime as dt
 
         data = mock.make_regular_2d_with_time_ungridded_data()
@@ -197,8 +197,8 @@ class TestNNTime(unittest.TestCase):
 
 class TestNNAltitude(unittest.TestCase):
     def test_basic_col_with_incompatible_points_throws_a_TypeError(self):
-        from colocate.kernels import nn_altitude
-        from colocate import collocate
+        from collocate.kernels import nn_altitude
+        from collocate import collocate
 
         data = mock.make_regular_4d_ungridded_data()
         # Make sample points with no time dimension specified
@@ -207,8 +207,8 @@ class TestNNAltitude(unittest.TestCase):
             new_data = collocate(sample_points, data, nn_altitude())['var']
 
     def test_basic_col_in_4d(self):
-        from colocate.kernels import nn_altitude
-        from colocate import collocate
+        from collocate.kernels import nn_altitude
+        from collocate import collocate
         import datetime as dt
 
         data = mock.make_regular_4d_ungridded_data()
@@ -223,8 +223,8 @@ class TestNNAltitude(unittest.TestCase):
         assert_almost_equal(new_data.data[2], 46.0)
 
     def test_already_collocated_in_col_in_2d(self):
-        from colocate.kernels import nn_altitude
-        from colocate import collocate
+        from collocate.kernels import nn_altitude
+        from collocate import collocate
         import datetime as dt
 
         data = mock.make_regular_4d_ungridded_data()
@@ -240,8 +240,8 @@ class TestNNAltitude(unittest.TestCase):
                 points finding any points which are closer than the current closest. If two distances were exactly
                 the same the first point to be chosen.
         """
-        from colocate.kernels import nn_altitude
-        from colocate import collocate
+        from collocate.kernels import nn_altitude
+        from collocate import collocate
         import datetime as dt
 
         data = mock.make_regular_4d_ungridded_data()
@@ -253,8 +253,8 @@ class TestNNAltitude(unittest.TestCase):
         assert_almost_equal(new_data.data[0], 16.0)
 
     def test_coordinates_outside_grid_in_col_in_2d(self):
-        from colocate.kernels import nn_altitude
-        from colocate import collocate
+        from collocate.kernels import nn_altitude
+        from collocate import collocate
         import datetime as dt
 
         data = mock.make_regular_4d_ungridded_data()
@@ -272,8 +272,8 @@ class TestNNAltitude(unittest.TestCase):
 
 class TestNNPressure(unittest.TestCase):
     def test_basic_col_with_incompatible_points_throws_an_AttributeError(self):
-        from colocate.kernels import nn_pressure
-        from colocate import collocate
+        from collocate.kernels import nn_pressure
+        from collocate import collocate
 
         data = mock.make_regular_4d_ungridded_data()
         # Make sample points with no time dimension specified
@@ -283,8 +283,8 @@ class TestNNPressure(unittest.TestCase):
             new_data = collocate(sample_points, data, nn_pressure())['var']
 
     def test_basic_col_in_4d(self):
-        from colocate.kernels import nn_pressure
-        from colocate import collocate
+        from collocate.kernels import nn_pressure
+        from collocate import collocate
         import datetime as dt
 
         data = mock.make_regular_4d_ungridded_data()
@@ -300,8 +300,8 @@ class TestNNPressure(unittest.TestCase):
         assert_almost_equal(new_data.data[2], 46.0)
 
     def test_already_collocated_in_col_in_2d(self):
-        from colocate.kernels import nn_pressure
-        from colocate import collocate
+        from collocate.kernels import nn_pressure
+        from collocate import collocate
         import datetime as dt
 
         data = mock.make_regular_4d_ungridded_data()
@@ -318,8 +318,8 @@ class TestNNPressure(unittest.TestCase):
                 points finding any points which are closer than the current closest. If two distances were exactly
                 the same the first point to be chosen.
         """
-        from colocate.kernels import nn_pressure
-        from colocate import collocate
+        from collocate.kernels import nn_pressure
+        from collocate import collocate
         import datetime as dt
 
         data = mock.make_regular_4d_ungridded_data()
@@ -331,8 +331,8 @@ class TestNNPressure(unittest.TestCase):
         assert_almost_equal(new_data.data[0], 1.0)
 
     def test_coordinates_outside_grid_in_col_in_2d(self):
-        from colocate.kernels import nn_pressure
-        from colocate import collocate
+        from collocate.kernels import nn_pressure
+        from collocate import collocate
         import datetime as dt
 
         data = mock.make_regular_4d_ungridded_data()
@@ -350,8 +350,8 @@ class TestNNPressure(unittest.TestCase):
 
 class TestMean(unittest.TestCase):
     def test_basic_col_in_4d(self):
-        from colocate.kernels import mean
-        from colocate import collocate
+        from collocate.kernels import mean
+        from collocate import collocate
         import datetime as dt
 
         data = mock.make_regular_4d_ungridded_data()

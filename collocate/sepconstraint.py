@@ -9,7 +9,14 @@ class SepConstraint:
     """
 
     def __init__(self, h_sep=None, a_sep=None, p_sep=None, t_sep=None):
+        """
+        Setup the constraints
 
+        :param float h_sep: The maximum horizontal separation (distance) in km
+        :param float a_sep: The maximum vertical (altitude) separation in m
+        :param float p_sep: The maximum relative pressure difference
+        :param np.datetimedelta t_sep: The maximum time difference
+        """
         self.haversine_distance_kd_tree_index = False
 
         self._index_cache = {}
@@ -34,12 +41,33 @@ class SepConstraint:
             self.constraints.append(self.time_constraint)
 
     def time_constraint(self, points, ref_point):
+        """
+        Find all points within the specified temporal distance of ref_point
+
+        :param pd.DataFrame points:
+        :param pd.Series ref_point:
+        :return:
+        """
         return np.nonzero(np.abs(points.time.values - ref_point.time.values) < self.t_sep)[0]
 
     def alt_constraint(self, points, ref_point):
+        """
+        Find all points within the specified altitude distance of ref_point
+
+        :param pd.DataFrame points:
+        :param pd.Series ref_point:
+        :return:
+        """
         return np.nonzero(np.abs(points.altitude.values - ref_point.altitude.values) < self.a_sep)[0]
 
     def pressure_constraint(self, points, ref_point):
+        """
+        Find all points within the specified relative pressure difference of ref_point
+
+        :param pd.DataFrame points:
+        :param pd.Series ref_point:
+        :return:
+        """
         greater_pressures = np.nonzero(((points.air_pressure.values / ref_point.air_pressure.values) < self.p_sep) &
                                        (points.air_pressure.values > ref_point.air_pressure.values))[0]
         lesser_pressures = np.nonzero(((ref_point.air_pressure.values / points.air_pressure.values) < self.p_sep) &
@@ -47,6 +75,13 @@ class SepConstraint:
         return np.concatenate([lesser_pressures, greater_pressures])
 
     def constrain_points(self, ref_point, data):
+        """
+        Find all the data points which meet all the (pre-)specified criteria against the ref_point
+
+        :param pd.DataFrame data:
+        :param pd.Series ref_point:
+        :return:
+        """
         if hasattr(ref_point, 'indices'):
             # Note that data_points has to be a dataframe at this point because of the indexing
             con_points = data.iloc[ref_point.indices]
@@ -61,6 +96,16 @@ class SepConstraint:
         return con_points
 
     def get_iterator(self, missing_data_for_missing_sample, data_points, points):
+        """
+        Get an iterator over all the data_points which meet the (pre-)specified criteria for each point
+
+        If missing_data_for_missing_sample is True then any sample points with a NaN value won't match any data points
+
+        :param bool missing_data_for_missing_sample: Ignore NaN sample points?
+        :param pd.DataFrame data_points:
+        :param pd.DataFrame points:
+        :return:
+        """
         cell_count = 0
         total_count = 0
         sample_points_count = len(points)
@@ -87,9 +132,9 @@ class SepConstraint:
         """
         Creates the k-D tree index.
 
-        :param DataArray data: points to index
+        :param pd.DataFrame data: points to index
         :param int leafsize: The leafsize to use when creating the tree
         """
-        from colocate.haversinedistancekdtreeindex import HaversineDistanceKDTreeIndex
+        from collocate.haversinedistancekdtreeindex import HaversineDistanceKDTreeIndex
 
         self.haversine_distance_kd_tree_index = HaversineDistanceKDTreeIndex(data[['latitude', 'longitude']], leafsize)
