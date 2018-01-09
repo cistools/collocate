@@ -63,7 +63,7 @@ class AbstractDataOnlyKernel(Kernel):
         :return: For return_size=1 a single value (number) otherwise a list of returns values, which represents some
             operation on the points provided
         """
-        values = data.values
+        values = data.vals
         if len(values) == 0:
             raise ValueError
         return self.get_value_for_data_only(values)

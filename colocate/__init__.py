@@ -57,7 +57,7 @@ def collocate(sample, data, kernel=None, index=None, missing_data_for_missing_sa
         result.loc[:, var_set_details[0][0]] = kernel.get_value(flattened_sample, flattened_data)
     else:
         for i, point, con_points in index.get_iterator(missing_data_for_missing_sample, flattened_data, flattened_sample):
-            result.loc[i, [v[0] for v in var_set_details]] = kernel.get_value(point, con_points.vals)
+            result.loc[i, [v[0] for v in var_set_details]] = kernel.get_value(point, con_points)
 
     # Convert the dataframe back to a dataset
     return_data = Dataset.from_dataframe(result)
