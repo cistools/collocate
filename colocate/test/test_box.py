@@ -1,16 +1,15 @@
 """
- Module to test the collocation routines
+ Module to test the top-level collocation routine
 """
 import unittest
 import datetime as dt
 
-from nose.tools import eq_
 import numpy as np
+import xarray as xr
 
 from colocate.kernels import moments
 from colocate import collocate
 from colocate.test import mock
-import xarray as xr
 
 
 class TestGeneralUngriddedCollocator(unittest.TestCase):
@@ -24,10 +23,6 @@ class TestGeneralUngriddedCollocator(unittest.TestCase):
         means = new_data['var']
         std_dev = new_data['var_std_dev']
         no_points = new_data['var_num_points']
-
-        eq_(means.name, 'rainfall_flux')
-        eq_(std_dev.name, 'Corrected sample standard deviation of TOTAL RAINFALL RATE: LS+CONV KG/M2/S')
-        eq_(no_points.name, 'Number of points used to calculate the mean of TOTAL RAINFALL RATE: LS+CONV KG/M2/S')
 
     def test_ungridded_ungridded_box_moments(self):
         data = mock.make_regular_2d_ungridded_data()
@@ -57,15 +52,19 @@ class TestGeneralUngriddedCollocator(unittest.TestCase):
 
         kernel = moments()
 
-        sample_mask = [False, True, False]
-        sample.data = np.ma.array([0, 0, 0], mask=sample_mask)
+        # Set a missing sample data-value
+        sample.data[1] = np.NaN
 
         output = collocate(sample, data, kernel, h_sep=500, missing_data_for_missing_sample=True)
 
+        expected_result = np.array([28.0/3, np.NaN, 20.0/3])
+        expected_stddev = np.array([1.52752523, np.NaN, 1.52752523])
+        expected_n = np.array([3, np.NaN, 3])
+
         assert isinstance(output, xr.Dataset)
-        assert np.array_equal(output['var'].data.mask, sample_mask)
-        assert np.array_equal(output['var_std_dev'].data.mask, sample_mask)
-        assert np.array_equal(output['var_num_points'].data.mask, sample_mask)
+        assert np.allclose(output['var'].data, expected_result, equal_nan=True)
+        assert np.allclose(output['var_std_dev'].data, expected_stddev, equal_nan=True)
+        assert np.allclose(output['var_num_points'].data, expected_n, equal_nan=True)
 
     def test_ungridded_ungridded_box_moments_no_missing_data_for_missing_sample(self):
         data = mock.make_regular_2d_ungridded_data()
@@ -76,19 +75,21 @@ class TestGeneralUngriddedCollocator(unittest.TestCase):
 
         kernel = moments()
 
-        sample_mask = [False, True, False]
-        sample.data = np.ma.array([0, 0, 0], mask=sample_mask)
+        # Set a missing sample data-value
+        sample.data[1] = np.NaN
 
         output = collocate(sample, data, kernel, h_sep=500, missing_data_for_missing_sample=False)
 
+        expected_result = np.array([28.0/3, 10.0, 20.0/3])
+        expected_stddev = np.array([1.52752523, 1.82574186, 1.52752523])
+        expected_n = np.array([3, 4, 3])
+
         assert isinstance(output, xr.Dataset)
-        assert not any(output['var'].data.mask)
-        assert not any(output['var_std_dev'].data.mask)
-        assert not any(output['var_num_points'].data.mask)
+        assert np.allclose(output['var'].data, expected_result)
+        assert np.allclose(output['var_std_dev'].data, expected_stddev)
+        assert np.allclose(output['var_num_points'].data, expected_n)
 
     def test_list_ungridded_ungridded_box_mean(self):
-        # TODO I think the basic problem here is that the points need to be flattened in init.collocate...
-
         ug_data_1 = mock.make_regular_2d_ungridded_data()
         ug_data_2 = mock.make_regular_2d_ungridded_data(data_offset=3)
         ug_data_2.attrs['long_name'] = 'TOTAL SNOWFALL RATE: LS+CONV KG/M2/S'
@@ -99,18 +100,18 @@ class TestGeneralUngriddedCollocator(unittest.TestCase):
         kernel = moments()
         output = collocate(sample_points, data_list, kernel, h_sep=500)
 
-        expected_result = np.array(list(range(1, 16)))
-        expected_n = np.array(15 * [1])
+        expected_result = np.array(list(range(1, 16))).reshape((5, 3))
+        expected_n = np.array(15 * [1]).reshape((5, 3))
         assert isinstance(output, xr.Dataset)
         assert output['snow'].name == 'snow'
         assert output['snow_std_dev'].name == 'snow_std_dev'
         assert output['snow_num_points'].name == 'snow_num_points'
-        assert np.allclose(output['var'].data, expected_result)
-        assert all(output['var_std_dev'].data.mask)
-        assert np.allclose(output['var_num_points'].data, expected_n)
-        assert np.allclose(output['var'].data, expected_result + 3)
-        assert all(output['var_std_dev'].data.mask)
-        assert np.allclose(output['var_num_points'].data, expected_n)
+        assert np.allclose(output['precip'].data, expected_result)
+        assert np.isnan(output['precip_std_dev'].data).all()
+        assert np.allclose(output['precip_num_points'].data, expected_n)
+        assert np.allclose(output['snow'].data, expected_result + 3)
+        assert np.isnan(output['snow_std_dev'].data).all()
+        assert np.allclose(output['snow_num_points'].data, expected_n)
 
 
 if __name__ == '__main__':
