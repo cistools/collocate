@@ -229,17 +229,7 @@ class nn_altitude(Kernel):
             Collocation using nearest neighbours in altitude, where both points and
               data are a list of HyperPoints. The default point is the first point.
         """
-        iterator = data.iterrows()
-
-        try:
-            nearest_point = next(iterator)[1]
-        except StopIteration:
-            # No points to check
-            raise ValueError
-        for idx, data_point in iterator:
-            if abs(point.altitude - nearest_point.altitude) > abs(point.altitude - data_point.altitude):
-                nearest_point = data_point
-        return nearest_point.vals
+        return data.loc[np.argmin(np.abs(data.altitude - point.altitude))].vals
 
 
 class nn_pressure(Kernel):
@@ -260,6 +250,8 @@ class nn_pressure(Kernel):
             else:
                 return point2.air_pressure / point1.air_pressure
 
+        # return data.loc[np.argmin(pres_sep(point, nearest_point))].vals
+
         iterator = data.iterrows()
 
         try:
@@ -279,16 +271,4 @@ class nn_time(Kernel):
             Collocation using nearest neighbours in time, where both points and
               data are a list of HyperPoints. The default point is the first point.
         """
-        # TODO I might be able to use the index lookup - if the time index is available
-        # return data.set_index(obs='time').sel(obs=point.time, method='nearest')
-        iterator = data.iterrows()
-
-        try:
-            nearest_point = next(iterator)[1]
-        except StopIteration:
-            # No points to check
-            raise ValueError
-        for idx, data_point in iterator:
-            if abs(point.time - nearest_point.time) > abs(point.time - data_point.time):
-                nearest_point = data_point
-        return nearest_point.vals
+        return data.loc[np.argmin(np.abs(data.time - point.time))].vals
