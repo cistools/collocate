@@ -58,10 +58,10 @@ class TestSepConstraint(unittest.TestCase):
 
         constraint = SepConstraint(a_sep=a_sep)
 
-        # This should leave us with 15 points:
+        # This should leave us with 15 points. They are flattened in the process though.
         ref_vals = np.array([[21., 22., 23., 24., 25.],
                              [26., 27., 28., 29., 30.],
-                             [31., 32., 33., 34., 35.]])
+                             [31., 32., 33., 34., 35.]]).flatten()
 
         new_points = constraint.constrain_points(sample_point, ug_data)
         new_vals = new_points.vals
@@ -86,7 +86,7 @@ class TestSepConstraint(unittest.TestCase):
         constraint.index_data(ug_data)
 
         # This should leave us with 30 points
-        ref_vals = np.reshape(np.arange(50) + 1.0, (10, 5))[:, 1:4]
+        ref_vals = np.reshape(np.arange(50) + 1.0, (10, 5))[:, 1:4].flatten()
 
         new_points = constraint.constrain_points(sample_point, ug_data)
         new_vals = new_points.vals
@@ -106,7 +106,7 @@ class TestSepConstraint(unittest.TestCase):
         constraint = SepConstraint(t_sep=np.timedelta64(1, 'D') + np.timedelta64(1, 'm'))
 
         # This should leave us with 30 points
-        ref_vals = np.reshape(np.arange(50) + 1.0, (10, 5))[:, 1:4]
+        ref_vals = np.reshape(np.arange(50) + 1.0, (10, 5))[:, 1:4].flatten()
 
         new_points = constraint.constrain_points(sample_point, ug_data)
         new_vals = new_points.vals
@@ -129,7 +129,7 @@ class TestSepConstraint(unittest.TestCase):
         ref_vals = np.array([[6., 7., 8., 9., 10.],
                              [11., 12., 13., 14., 15.],
                              [16., 17., 18., 19., 20.],
-                             [21., 22., 23., 24., 25.]])
+                             [21., 22., 23., 24., 25.]]).flatten()
 
         new_points = constraint.constrain_points(sample_point, ug_data)
         new_vals = new_points.vals
