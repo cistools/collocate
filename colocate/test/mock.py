@@ -28,7 +28,7 @@ def make_dummy_time_series(len=10, as_data_frame=False):
 def make_dummy_sample_points(data=None, as_data_frame=False, **kwargs):
     # Find the length of the first array
     n_values = len(list(kwargs.values())[0])
-    data = data if data is not None else np.empty((n_values,))
+    data = data if data is not None else np.zeros((n_values,))
     da = xr.DataArray(data, dims=['obs'], coords={k: (['obs'], v) for k, v in kwargs.items()})
     if as_data_frame:
         return da.to_dataframe('vals')
