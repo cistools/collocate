@@ -188,7 +188,7 @@ class TestNNTime(unittest.TestCase):
         sample_points = mock.make_dummy_sample_points(latitude=[0.0, 0.0, 0.0], longitude=[0.0, 0.0, 0.0],
                                                       time=[dt.datetime(1984, 8, 26),
                                                             dt.datetime(1984, 8, 26),
-                                                            dt.datetime(1984, 8, 27)])
+                                                            dt.datetime(1984, 9, 27)])
         new_data = collocate(sample_points, ug_data, nn_time())['var']
         assert_almost_equal(new_data.data[0], 1.0)
         assert_almost_equal(new_data.data[1], 1.0)
