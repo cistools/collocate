@@ -12,7 +12,6 @@ def make_dummy_time_series(len=10, as_data_frame=False):
     :param len: length of teh time series and associated data
     :return:
     """
-
     data = 15 + 8 * np.random.randn(1, 1, len)
     times = pd.date_range('2014-09-06', periods=len)
     lon = [[-12.1]]
@@ -225,16 +224,6 @@ def make_regular_4d_ungridded_data(as_data_frame=False):
     pres[0, :] = 4
     pres[1, :] = 16
 
-    # a = AuxCoord(a, standard_name='altitude', units='meters')
-    # x = AuxCoord(x, standard_name='latitude', units='degrees')
-    # y = AuxCoord(y, standard_name='longitude', units='degrees')
-    # p = AuxCoord(p, standard_name='air_pressure', units='Pa')
-    # t = AuxCoord(t, standard_name='time', units=cis_standard_time_unit)
-
-    # return Cube(data, standard_name='rainfall_flux', long_name="TOTAL RAINFALL RATE: LS+CONV KG/M2/S",
-    #             units="kg m-2 s-1", dim_coords_and_dims=[(DimCoord(range(10), var_name="z"), 0),
-    #                                                      (DimCoord(range(5), var_name="t"), 1)],
-    #             aux_coords_and_dims=[(x, (0, 1)), (y, (0, 1)), (t, (0, 1)), (a, (0, 1)), (p, (0, 1))])
     da = xr.DataArray(data, coords={'altitude': (['z'], alt),
                                       'latitude': (['t'], x_points),
                                       'longitude': (['t'], y_points),
