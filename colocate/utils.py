@@ -1,5 +1,5 @@
 """
-    Top level collocation objects
+Iris wrapper and associated utilities
 """
 from functools import wraps
 from colocate import collocate
@@ -10,7 +10,7 @@ def cube_wrapper(xr_func):
     Wrap a function which works on two xarray Datasets with an Cube->Dataset converter to allow calling with an
      two Cube objects. Takes advantage of the cube metadata to perform unification on the two cubes before converting.
 
-    :param func: A (collocation) function which takes two Datasets as its first arguments and returns a Dataset
+    :param xr_func: A (collocation) function which takes two Datasets as its first arguments and returns a Dataset
     :return: A function which takes two Cube objects as its first arguments and returns a Cube object
     """
     from iris.util import unify_time_units
@@ -50,8 +50,9 @@ iris_colocate = cube_wrapper(collocate)
 
 def _fix_longitude_range(data_points, range_start):
     """Sets the longitude range of the data points to match that of the sample coordinates.
-    :param range_start: The longitude
-    :param data_points: HyperPointList or GriddedData of data to fix
+
+    :param float range_start: The longitude
+    :param iris.cube.Cube data_points: Cube to fix
     """
     from iris.analysis.cartography import wrap_lons
 
@@ -72,7 +73,8 @@ def set_longitude_range(cube, range_start):
     The data array is rotated correspondingly around the dimension
     corresponding to the longitude coordinate.
 
-    :param range_start: starting value of required longitude range
+    :param iris.cube.Cube: The Cube to fix
+    :param float range_start: starting value of required longitude range
     """
     import numpy as np
     lon_coord = cube.coords(standard_name="longitude")
