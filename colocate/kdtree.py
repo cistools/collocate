@@ -1,6 +1,9 @@
 """
 # Copyright Anne M. Archibald 2008
 # Released under the scipy license
+
+Adapted in CIS and reused here with permission.
+
 """
 import sys
 from heapq import heappush, heappop
