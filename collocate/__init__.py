@@ -15,6 +15,14 @@ def collocate(sample, data, kernel=None, constraint=None, missing_data_for_missi
     :param xr.DataArray data: The data to collocate from
     :param Kernel kernel: An instance of a Kernel subclass which takes a number of points and returns one or more values
     :param SepConstraint constraint: An optional, pre-constructed constraint object
+
+    If a constraint isn't specified then the following arguments will be used to construct one
+
+    :param float h_sep: The maximum horizontal separation (distance) in km
+    :param float a_sep: The maximum vertical (altitude) separation in m
+    :param float p_sep: The maximum relative pressure difference
+    :param np.datetimedelta t_sep: The maximum time difference
+
     :return xr.Dataset: With the same coordinates as the sample and one DataArray for each Kernel return value
     """
     constraint = constraint or SepConstraint(**kwargs)
