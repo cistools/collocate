@@ -50,6 +50,8 @@ class SepConstraint:
         if hasattr(ref_point, 'indices'):
             # Note that data_points has to be a dataframe at this point because of the indexing
             con_points = data.iloc[ref_point.indices]
+        elif self.haversine_distance_kd_tree_index and self.h_sep:
+            con_points = data.iloc[self.haversine_distance_kd_tree_index.find_points_within_distance(ref_point, self.h_sep)]
         else:
             con_points = data
 
