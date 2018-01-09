@@ -14,10 +14,11 @@ class TestSepConstraint(unittest.TestCase):
         import datetime as dt
         import numpy as np
 
-        ug_data = mock.make_regular_4d_ungridded_data()
+        ug_data = mock.make_regular_4d_ungridded_data(as_data_frame=True)
         sample_point = mock.make_dummy_sample_points(latitude=[0.0], longitude=[0.0],
                                                      altitude=[50.0], air_pressure=[50.0],
-                                                     time=[dt.datetime(1984, 8, 29)])
+                                                     time=[dt.datetime(1984, 8, 29)],
+                                                     as_data_frame=True)
         # One degree near 0, 0 is about 110km in latitude and longitude, so 300km should keep us to within 3 degrees
         # in each direction
         h_sep = 1000
@@ -48,9 +49,10 @@ class TestSepConstraint(unittest.TestCase):
         import datetime as dt
         import numpy as np
 
-        ug_data = mock.make_regular_4d_ungridded_data()
+        ug_data = mock.make_regular_4d_ungridded_data(as_data_frame=True)
         sample_point = mock.make_dummy_sample_points(latitude=[0.0], longitude=[0.0], altitude=[50.0],
-                                                     time=[dt.datetime(1984, 8, 29)])
+                                                     time=[dt.datetime(1984, 8, 29)],
+                                                     as_data_frame=True)
 
         # 15m altitude seperation
         a_sep = 15
@@ -72,9 +74,10 @@ class TestSepConstraint(unittest.TestCase):
         import datetime as dt
         import numpy as np
 
-        ug_data = mock.make_regular_4d_ungridded_data()
+        ug_data = mock.make_regular_4d_ungridded_data(as_data_frame=True)
         sample_point = mock.make_dummy_sample_points(latitude=[0.0], longitude=[0.0], altitude=[50.0],
-                                                     time=[dt.datetime(1984, 8, 29)])
+                                                     time=[dt.datetime(1984, 8, 29)],
+                                                     as_data_frame=True)
 
         # One degree near 0, 0 is about 110km in latitude and longitude, so 300km should keep us to within 3 degrees
         # in each direction
@@ -96,9 +99,9 @@ class TestSepConstraint(unittest.TestCase):
         import datetime as dt
         import numpy as np
 
-        ug_data = mock.make_regular_4d_ungridded_data()
+        ug_data = mock.make_regular_4d_ungridded_data(as_data_frame=True)
         sample_point = mock.make_dummy_sample_points(latitude=[0.0], longitude=[0.0], altitude=[50.0],
-                                                     time=[dt.datetime(1984, 8, 29)])
+                                                     time=[dt.datetime(1984, 8, 29)], as_data_frame=True)
 
         # 1 day (and a little bit) time seperation
         constraint = SepConstraint(t_sep=np.timedelta64(1, 'D') + np.timedelta64(1, 'm'))
@@ -116,9 +119,10 @@ class TestSepConstraint(unittest.TestCase):
         import datetime as dt
         import numpy as np
 
-        ug_data = mock.make_regular_4d_ungridded_data()
+        ug_data = mock.make_regular_4d_ungridded_data(as_data_frame=True)
         sample_point = mock.make_dummy_sample_points(latitude=[0.0], longitude=[0.0], altitude=[50.0],
-                                                     air_pressure=[24.0], time=[dt.datetime(1984, 8, 29)])
+                                                     air_pressure=[24.0], time=[dt.datetime(1984, 8, 29)],
+                                                     as_data_frame=True)
 
         constraint = SepConstraint(p_sep=2)
 

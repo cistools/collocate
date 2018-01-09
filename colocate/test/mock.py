@@ -8,7 +8,7 @@ import numpy.ma as ma
 import xarray as xr
 
 
-def make_dummy_time_series(len=10):
+def make_dummy_time_series(len=10, as_data_frame=False):
     """
     Create a time series of ungridded data of length len, with a single lat/lon coordinate (65.2, -12.1)
     :param len: length of teh time series and associated data
@@ -20,20 +20,26 @@ def make_dummy_time_series(len=10):
     lon = [[-12.1]]
     lat = [[65.2]]
 
-    return xr.DataArray(data, coords={'longitude': (['x', 'y'], lon), 'latitude': (['x', 'y'], lat), 'time': times})
+    da = xr.DataArray(data, coords={'longitude': (['x', 'y'], lon), 'latitude': (['x', 'y'], lat), 'time': times})
+    if as_data_frame:
+        return da.to_dataframe('vals')
+    else:
+        return da
 
 
-def make_dummy_sample_points(data=None, **kwargs):
+def make_dummy_sample_points(data=None, as_data_frame=False, **kwargs):
     # Find the length of the first array
     n_values = len(list(kwargs.values())[0])
     data = data if data is not None else np.empty((n_values,))
-    ds = xr.DataArray(data, dims=['obs'], coords={k: (['obs'], v) for k, v in kwargs.items()})
-    # return ds.set_index(obs=kwargs.keys())
-    return ds
+    da = xr.DataArray(data, dims=['obs'], coords={k: (['obs'], v) for k, v in kwargs.items()})
+    if as_data_frame:
+        return da.to_dataframe('vals')
+    else:
+        return da
 
 
 def make_regular_2d_ungridded_data(lat_dim_length=5, lat_min=-10, lat_max=10, lon_dim_length=3, lon_min=-5, lon_max=5,
-                                   data_offset=0, mask=None):
+                                   data_offset=0, mask=None, as_data_frame=False):
     """
     Makes a well defined ungridded data object. If no arguments are supplied, it is of shape 5x3 with data as follows
         array([[1,2,3],
@@ -77,8 +83,12 @@ def make_regular_2d_ungridded_data(lat_dim_length=5, lat_min=-10, lat_max=10, lo
         data = np.ma.asarray(data)
         data.mask = mask
 
-    return xr.DataArray(data, coords={'longitude': (['x', 'y'], x), 'latitude': (['x', 'y'], y)},
+    da = xr.DataArray(data, coords={'longitude': (['x', 'y'], x), 'latitude': (['x', 'y'], y)},
                         dims=['x', 'y'])
+    if as_data_frame:
+        return da.to_dataframe('vals')
+    else:
+        return da
 
 
 def make_regular_2d_ungridded_data_with_missing_values(**kwargs):
@@ -112,7 +122,7 @@ def make_regular_2d_ungridded_data_with_missing_values(**kwargs):
     return make_regular_2d_ungridded_data(mask=mask, **kwargs)
 
 
-def make_regular_2d_with_time_ungridded_data():
+def make_regular_2d_with_time_ungridded_data(as_data_frame=False):
     """
         Makes a well defined ungridded data object of shape 5x3 with data as follows
         array([[1,2,3],
@@ -145,12 +155,16 @@ def make_regular_2d_with_time_ungridded_data():
 
     data = np.reshape(np.arange(15) + 1.0, (5, 3))
 
-    return xr.DataArray(data, coords={'longitude': (['x', 'y'], x), 'latitude': (['x', 'y'], y),
+    da = xr.DataArray(data, coords={'longitude': (['x', 'y'], x), 'latitude': (['x', 'y'], y),
                                       'time': (['x', 'y'], times)},
                         dims=['x', 'y'])
+    if as_data_frame:
+        return da.to_dataframe('vals')
+    else:
+        return da
 
 
-def make_regular_4d_ungridded_data():
+def make_regular_4d_ungridded_data(as_data_frame=False):
     """
         Makes a well defined ungridded data object of shape 10x5 with data as follows
 
@@ -223,9 +237,13 @@ def make_regular_4d_ungridded_data():
     #             units="kg m-2 s-1", dim_coords_and_dims=[(DimCoord(range(10), var_name="z"), 0),
     #                                                      (DimCoord(range(5), var_name="t"), 1)],
     #             aux_coords_and_dims=[(x, (0, 1)), (y, (0, 1)), (t, (0, 1)), (a, (0, 1)), (p, (0, 1))])
-    return xr.DataArray(data, coords={'altitude': (['z'], alt),
+    da = xr.DataArray(data, coords={'altitude': (['z'], alt),
                                       'latitude': (['t'], x_points),
                                       'longitude': (['t'], y_points),
                                       'air_pressure': (['z', 't'], pres),
                                       'time': (['t'], times)},
                         dims=['z', 't'])
+    if as_data_frame:
+        return da.to_dataframe('vals')
+    else:
+        return da

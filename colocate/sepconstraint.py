@@ -34,53 +34,34 @@ class SepConstraint:
             self.constraints.append(self.time_constraint)
 
     def time_constraint(self, points, ref_point):
-        indices = np.nonzero(np.abs(points.time - ref_point.time) < self.t_sep).values[0]
-        dimension = points.coords['time'].dims[0]
-        return points.sel(**{dimension: indices})
+        return np.nonzero(np.abs(points.time.values - ref_point.time.values) < self.t_sep)[0]
 
     def alt_constraint(self, points, ref_point):
-        indices = np.nonzero(np.abs(points.altitude - ref_point.altitude) < self.a_sep).values[0]
-        dimension = points.coords['altitude'].dims[0]
-        return points.sel(**{dimension: indices})
+        return np.nonzero(np.abs(points.altitude.values - ref_point.altitude.values) < self.a_sep)[0]
 
     def pressure_constraint(self, points, ref_point):
-        greater_pressures = np.nonzero(((points.air_pressure / ref_point.air_pressure.item()) < self.p_sep) &
-                                       (points.air_pressure > ref_point.air_pressure.item())).values[0]
-        lesser_pressures = np.nonzero(((ref_point.air_pressure.item() / points.air_pressure) < self.p_sep) &
-                                      (points.air_pressure <= ref_point.air_pressure.item())).values[0]
-        indices = np.concatenate([lesser_pressures, greater_pressures])
-        dimension = points.coords['air_pressure'].dims[0]
-        return points.sel(**{dimension: indices})
+        greater_pressures = np.nonzero(((points.air_pressure.values / ref_point.air_pressure.values) < self.p_sep) &
+                                       (points.air_pressure.values > ref_point.air_pressure.values))[0]
+        lesser_pressures = np.nonzero(((ref_point.air_pressure.values / points.air_pressure.values) < self.p_sep) &
+                                      (points.air_pressure.values <= ref_point.air_pressure.values))[0]
+        return np.concatenate([lesser_pressures, greater_pressures])
 
     def constrain_points(self, ref_point, data):
-        if self.haversine_distance_kd_tree_index and self.h_sep:
-            point_indices = self._get_cached_indices(ref_point)
-            if point_indices is None:
-                point_indices = self.haversine_distance_kd_tree_index.find_points_within_distance(ref_point, self.h_sep)
-                self._add_cached_indices(ref_point, point_indices)
-            dimension = data.coords['longitude'].dims[0]
-            con_points = data.sel(**{dimension: point_indices})
+        if hasattr(ref_point, 'indices'):
+            # Note that data_points has to be a dataframe at this point because of the indexing
+            con_points = data.iloc[ref_point.indices]
         else:
             con_points = data
-        for constrain in self.constraints:
-            con_points = constrain(con_points, ref_point)
+
+        for check in self.constraints:
+            con_points = con_points.iloc[check(con_points, ref_point)]
 
         return con_points
-
-    def _get_cached_indices(self, ref_point):
-        # Don't use the value as a key (it's both irrelevant and un-hashable)
-        return self._index_cache.get((ref_point.latitude.item(), ref_point.longitude.item()), None)
-
-    def _add_cached_indices(self, ref_point, indices):
-        # Don't use the value as a key (it's both irrelevant and un-hashable)
-        self._index_cache[(ref_point.latitude.item(), ref_point.longitude.item())] = indices
 
     def get_iterator(self, missing_data_for_missing_sample, data_points, points):
         cell_count = 0
         total_count = 0
         sample_points_count = len(points)
-
-        indices = None
 
         if self.haversine_distance_kd_tree_index and self.h_sep:
             points['indices'] = self.haversine_distance_kd_tree_index.find_points_within_distance_sample(points, self.h_sep)
@@ -96,13 +77,7 @@ class SepConstraint:
 
             # If missing_data_for_missing_sample
             if not (missing_data_for_missing_sample and (hasattr(p, 'vals') and np.isnan(p.vals))):
-                if hasattr(p, 'indices'):
-                    # Note that data_points has to be a dataframe at this point because of the indexing
-                    d_points = data_points.iloc[p.indices]
-                else:
-                    d_points = data_points
-                for check in self.constraints:
-                    d_points = d_points.iloc[check(d_points, p)]
+                d_points = self.constrain_points(p, data_points)
 
                 yield i, p, d_points
 
@@ -114,42 +89,5 @@ class SepConstraint:
         :param int leafsize: The leafsize to use when creating the tree
         """
         from colocate.haversinedistancekdtreeindex import HaversineDistanceKDTreeIndex
-        from colocate.utils import get_lat_lon_names
 
-        # lat_lon_points = data.to_dataframe(data.name or 'unknown').loc[:, get_lat_lon_names(data)]
-        lat_lon_points = np.column_stack((data.latitude.values.ravel(),
-                                           data.longitude.values.ravel()))
-        # data[['latitude', 'longitude']]
-        self.haversine_distance_kd_tree_index = HaversineDistanceKDTreeIndex(lat_lon_points, leafsize)
-
-
-def index_iterator_nditer(points, include_masked=True):
-    """Iterates over the indexes of a multi-dimensional array of a specified shape.
-    The last index changes most rapidly.
-
-    :param points: array to iterate over
-    :param include_masked: iterate over masked elements
-    :return: yields tuples of array indexes
-    """
-
-    num_cells = np.product(points.data.shape)
-    cell_count = 0
-    cell_total = 0
-
-    it = np.nditer(points.data, flags=['multi_index'])
-    while not it.finished:
-        if include_masked or it[0] is not np.ma.masked:
-            yield it.multi_index
-
-        it.iternext()
-
-        # Log progress periodically.
-        if cell_count == 10000:
-            cell_total += 1
-            number_cells_processed = cell_total * 10000
-            logging.info("    Processed %d points of %d (%d%%)", number_cells_processed, num_cells,
-                         int(number_cells_processed * 100 / num_cells))
-            cell_count = 0
-        cell_count += 1
-
-
+        self.haversine_distance_kd_tree_index = HaversineDistanceKDTreeIndex(data[['latitude', 'longitude']], leafsize)
