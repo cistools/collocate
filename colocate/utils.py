@@ -2,6 +2,7 @@
     Top level collocation objects
 """
 from functools import wraps
+from colocate import collocate
 
 
 def get_lat_lon_names(data):
@@ -15,7 +16,7 @@ def get_lat_lon_names(data):
     return lat_name, lon_name
 
 
-def cube_unify_col_wrapper(xr_func):
+def cube_wrapper(xr_func):
     """
     Wrap a function which works on two xarray Datasets with an Cube->Dataset converter to allow calling with an
      two Cube objects. Takes advantage of the cube metadata to perform unification on the two cubes before converting.
@@ -53,6 +54,9 @@ def cube_unify_col_wrapper(xr_func):
         return res
 
     return cube_func
+
+
+iris_colocate = cube_wrapper(collocate)
 
 
 def _fix_longitude_range(data_points, range_start):
