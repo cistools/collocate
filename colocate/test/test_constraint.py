@@ -85,8 +85,8 @@ class TestSepConstraint(unittest.TestCase):
         # Create the index
         constraint.index_data(ug_data)
 
-        # This should leave us with 30 points
-        ref_vals = np.reshape(np.arange(50) + 1.0, (10, 5))[:, 1:4].flatten()
+        # This should leave us with 30 points. Use fortran ordering to match the resulting layout
+        ref_vals = np.reshape(np.arange(50) + 1.0, (10, 5))[:, 1:4].flatten(order='F')
 
         new_points = constraint.constrain_points(sample_point, ug_data)
         new_vals = new_points.vals
