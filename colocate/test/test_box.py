@@ -110,8 +110,3 @@ class TestGeneralUngriddedCollocator(unittest.TestCase):
         assert np.allclose(output['snow'].data, expected_result + 3)
         assert np.isnan(output['snow_std_dev'].data).all()
         assert np.allclose(output['snow_num_points'].data, expected_n)
-
-
-if __name__ == '__main__':
-    import nose
-    nose.runmodule()

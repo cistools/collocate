@@ -18,7 +18,7 @@ else:
     dependencies = ["xarray",
                     "scipy>=0.15.0"]
     optional_dependencies = ['iris']
-    test_dependencies = ["nose"]
+    test_dependencies = []
 
 
 class check_dep(Command):
