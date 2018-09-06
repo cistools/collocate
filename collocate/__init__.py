@@ -39,8 +39,8 @@ def collocate(sample, data, kernel=None, constraint=None, missing_data_for_missi
         return output
 
     # Create a flattened dataframe (with a standard name) to work with the data
-    flattened_data = data.to_dataframe('vals')
-    flattened_sample = sample.to_dataframe('vals')
+    flattened_data = data.to_dataframe('vals').reset_index()
+    flattened_sample = sample.to_dataframe('vals').reset_index()
 
     constraint.index_data(flattened_data)
 

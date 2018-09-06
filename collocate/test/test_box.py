@@ -22,6 +22,17 @@ class TestGeneralUngriddedCollocator(unittest.TestCase):
         std_dev = new_data['var_std_dev']
         no_points = new_data['var_num_points']
 
+    def test_named_dimensions(self):
+        da_latlon_as_dims = xr.DataArray(np.arange(100).reshape(10, 10),
+                                         dims=('longitude', 'latitude'),
+                                         coords={'latitude': np.arange(0, 10),
+                                                 'longitude': np.arange(0, 10)})
+        pt3 = da_latlon_as_dims.isel(longitude=slice(0, 4), latitude=3)
+        output = collocate(pt3, da_latlon_as_dims, h_sep=1)
+
+        expected_result = np.array([3, 13, 23, 33])
+        assert np.allclose(output['var'].data, expected_result)
+
     def test_ungridded_ungridded_box_moments(self):
         data = mock.make_regular_2d_ungridded_data()
         sample = mock.make_dummy_sample_points(latitude=[1.0, 3.0, -1.0], longitude=[1.0, 3.0, -1.0], altitude=[12.0, 7.0, 5.0],
@@ -98,8 +109,8 @@ class TestGeneralUngriddedCollocator(unittest.TestCase):
         kernel = moments()
         output = collocate(sample_points, data_list, kernel, h_sep=500)
 
-        expected_result = np.array(list(range(1, 16))).reshape((5, 3))
-        expected_n = np.array(15 * [1]).reshape((5, 3))
+        expected_result = np.array(list(range(1, 16)))
+        expected_n = np.array(15 * [1])
         assert isinstance(output, xr.Dataset)
         assert output['snow'].name == 'snow'
         assert output['snow_std_dev'].name == 'snow_std_dev'
