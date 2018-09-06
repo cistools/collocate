@@ -16,7 +16,7 @@ if on_rtd:
 
 else:
     dependencies = ["xarray"]
-    optional_dependencies = ['iris']
+    optional_dependencies = {'iris': 'scitools-iris'}
     test_dependencies = []
 
 
